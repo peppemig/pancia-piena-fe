@@ -12,8 +12,13 @@ import { Input } from "@/components/ui/input";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Facebook, Mail } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import {
+  registerWithEmailAndPassword,
+  signInWithGoogle,
+} from "../config/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(3).max(50),
@@ -23,6 +28,7 @@ const formSchema = z.object({
 });
 
 const Register = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,8 +40,18 @@ const Register = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    const { email, password } = values;
+    registerWithEmailAndPassword(email, password)
+      .then(() => navigate("/"))
+      .catch((e) => alert(e));
   };
+
+  const onGoogleSignIn = () => {
+    signInWithGoogle()
+      .then(() => navigate("/"))
+      .catch((e) => alert(e));
+  };
+
   return (
     <div className="container-custom w-full flex items-center justify-center mt-10">
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-10 w-full max-w-[556px]">
@@ -108,12 +124,14 @@ const Register = () => {
           </form>
           <Separator className="my-4" />
           <div className="w-full flex flex-col space-y-4">
-            <Button variant="outline" className="text-lg">
-              <Mail className="mr-2 h-5 w-5" /> Registrati con Gmail
+            <Button
+              onClick={onGoogleSignIn}
+              variant="outline"
+              className="text-lg"
+            >
+              <FcGoogle className="mr-2 h-5 w-5" /> Registrati con Google
             </Button>
-            <Button variant="outline" className="text-lg">
-              <Facebook className="mr-2 h-5 w-5" /> Registrati con Facebook
-            </Button>
+
             <p className="text-center">
               Hai già un account?{" "}
               <Link to="/login" className="font-bold">

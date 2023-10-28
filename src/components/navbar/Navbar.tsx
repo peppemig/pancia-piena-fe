@@ -11,7 +11,6 @@ import { useTheme } from "../ThemeProvider";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
-  console.log(theme);
   return (
     <div className="w-full border h-16 flex items-center justify-center">
       <div className="container-custom flex justify-between items-center">
