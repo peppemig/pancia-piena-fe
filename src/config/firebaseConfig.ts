@@ -64,4 +64,5 @@ export {
   registerWithEmailAndPassword,
   logOut,
   sendPasswordReset,
+  auth,
 };
