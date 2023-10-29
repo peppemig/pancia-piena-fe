@@ -42,8 +42,8 @@ const Register = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const { email, password } = values;
-    registerWithEmailAndPassword(email, password)
+    const { email, password, name, surname } = values;
+    registerWithEmailAndPassword(email, password, name, surname)
       .then(() => {
         navigate("/");
         toast({

@@ -8,6 +8,7 @@ import {
   sendPasswordResetEmail,
   signOut,
 } from "firebase/auth";
+import axios from "axios";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -25,8 +26,11 @@ const googleProvider = new GoogleAuthProvider();
 const signInWithGoogle = async () => {
   const response = await signInWithPopup(auth, googleProvider);
   const user = response.user;
-  console.log(user);
-  // TODO: save user to external db
+  await axios.post("http://localhost:3000/api/v1/users", {
+    id: user.uid,
+    name: user.displayName,
+    email: user.email,
+  });
 };
 
 const loginWithEmailAndPassword = async (email: string, password: string) => {
@@ -37,12 +41,17 @@ const loginWithEmailAndPassword = async (email: string, password: string) => {
 
 const registerWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
+  name: string,
+  surname: string
 ) => {
   const response = await createUserWithEmailAndPassword(auth, email, password);
   const user = response.user;
-  console.log(user);
-  // TODO: save user to external db
+  await axios.post("http://localhost:3000/api/v1/users", {
+    id: user.uid,
+    name: `${name} ${surname}`,
+    email: user.email,
+  });
 };
 
 const logOut = () => {
