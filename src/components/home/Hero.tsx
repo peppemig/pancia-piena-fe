@@ -3,8 +3,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Lottie from "lottie-react";
 import heroAnimation from "../../assets/hero-animation.json";
+import { User } from "firebase/auth";
 
-const Hero = () => {
+type HeroProps = {
+  user: User | null | undefined;
+};
+
+const Hero = ({ user }: HeroProps) => {
   return (
     <section className="container-custom flex flex-col gap-4 pb-12 pt-4 text-center lg:items-center lg:gap-8 lg:py-20">
       <div className="flex flex-1 flex-col items-center gap-4 text-center lg:gap-8">
@@ -14,12 +19,21 @@ const Hero = () => {
             Rivoluziona la gestione degli ordini nel tuo ristorante
           </h2>
         </div>
-        <Link
-          to="/register"
-          className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}
-        >
-          Inizia ora!
-        </Link>
+        {user ? (
+          <Link
+            to="/orders/list"
+            className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}
+          >
+            Controlla i tuoi ordini!
+          </Link>
+        ) : (
+          <Link
+            to="/register"
+            className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}
+          >
+            Inizia ora!
+          </Link>
+        )}
         <Lottie
           animationData={heroAnimation}
           loop={true}

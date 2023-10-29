@@ -3,6 +3,23 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Package,
+  ChefHat,
+  PlusCircleIcon,
+  LogOut,
+  User2,
+  AreaChart,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Moon, Sun } from "lucide-react";
@@ -35,21 +52,55 @@ const Navbar = ({ user }: NavbarProps) => {
           <NavigationMenuList className="flex gap-1">
             {user ? (
               <>
-                <NavigationMenuItem>
-                  <Avatar>
-                    <AvatarImage
-                      src={user.photoURL === null ? "" : user.photoURL}
-                    />
-                    <AvatarFallback>
-                      {user.email?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Button onClick={onLogout} variant="destructive">
-                    Esci
-                  </Button>
-                </NavigationMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Avatar>
+                      <AvatarImage
+                        src={user.photoURL === null ? "" : user.photoURL}
+                      />
+                      <AvatarFallback>
+                        {user.email?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuLabel>Il mio account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/orders/list")}
+                      >
+                        <ChefHat className="mr-2 h-4 w-4" />
+                        <span>Ordini</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/orders/create")}
+                      >
+                        <PlusCircleIcon className="mr-2 h-4 w-4" />
+                        <span>Crea un ordine</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/products/list")}
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        <span>Prodotti</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                        <AreaChart className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <User2 className="mr-2 h-4 w-4" />
+                      <span>Profilo</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Esci</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>

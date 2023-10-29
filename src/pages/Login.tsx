@@ -7,6 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
@@ -27,6 +28,7 @@ const formSchema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,14 +40,38 @@ const Login = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const { email, password } = values;
     loginWithEmailAndPassword(email, password)
-      .then(() => navigate("/"))
-      .catch((e) => alert(e));
+      .then(() => {
+        navigate("/");
+        toast({
+          title: "Accesso effettuato",
+          description: "Sei pronto per una giornata piena di ordini? 😊",
+        });
+      })
+      .catch(() =>
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente l'accesso",
+        })
+      );
   };
 
   const onGoogleSignIn = () => {
     signInWithGoogle()
-      .then(() => navigate("/"))
-      .catch((e) => alert(e));
+      .then(() => {
+        navigate("/");
+        toast({
+          title: "Accesso effettuato",
+          description: "Sei pronto per una giornata piena di ordini? 😊",
+        });
+      })
+      .catch(() =>
+        toast({
+          variant: "destructive",
+          title: "Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente l'accesso",
+        })
+      );
   };
 
   return (

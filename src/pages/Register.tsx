@@ -7,6 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
@@ -29,6 +30,7 @@ const formSchema = z.object({
 
 const Register = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,14 +44,36 @@ const Register = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const { email, password } = values;
     registerWithEmailAndPassword(email, password)
-      .then(() => navigate("/"))
-      .catch((e) => alert(e));
+      .then(() => {
+        navigate("/");
+        toast({
+          title: "Registrazione effettuata",
+        });
+      })
+      .catch(() =>
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la registrazione",
+        })
+      );
   };
 
   const onGoogleSignIn = () => {
     signInWithGoogle()
-      .then(() => navigate("/"))
-      .catch((e) => alert(e));
+      .then(() => {
+        navigate("/");
+        toast({
+          title: "Registrazione effettuata",
+        });
+      })
+      .catch(() =>
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la registrazione",
+        })
+      );
   };
 
   return (
