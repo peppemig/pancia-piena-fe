@@ -1,10 +1,30 @@
 import { User } from "firebase/auth";
-import { Link, Navigate } from "react-router-dom";
-//import { Button } from "@/components/ui/button";
+import { Navigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import ProductCard from "@/components/products/ProductCard";
-import { buttonVariants } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import productsService from "@/api/productsService";
+import LoadingState from "@/components/LoadingState";
+import { Input } from "@/components/ui/input";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type ProductsProps = {
   user: User | null | undefined;
@@ -17,55 +37,154 @@ type Product = {
   userId: string;
 };
 
+const formSchema = z.object({
+  name: z.string().min(1).max(50),
+  price: z.coerce.number().min(0.05),
+});
+
 const Products = ({ user }: ProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      price: 0,
+    },
+  });
 
   useEffect(() => {
     if (user) {
       getProducts();
     }
-  }, [user]); // Make sure to include user in the dependency array
+  }, [user]);
 
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
-  const getProducts = () => {
+  const onCreateProduct = (values: z.infer<typeof formSchema>) => {
+    setOpen(false);
     user
       .getIdToken()
       .then((token) => {
-        axios
-          .get("http://localhost:3000/api/v1/products", {
-            headers: { Authorization: `Bearer ${token}` },
+        productsService
+          .createProduct(token, values)
+          .then(() => {
+            setIsLoading(false);
+            getProducts();
           })
-          .then((res) => setProducts(res.data.products))
-          .catch((e) => console.log(e));
+          .catch(() => setIsLoading(false));
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch(() => setIsLoading(false));
   };
 
+  const getProducts = () => {
+    setIsLoading(true);
+    user
+      .getIdToken()
+      .then((token) => {
+        productsService
+          .getProducts(token)
+          .then((res) => {
+            setProducts(res.data.products);
+            setIsLoading(false);
+          })
+          .catch(() => setIsLoading(false));
+      })
+      .catch(() => setIsLoading(false));
+  };
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
   return (
-    <div className="container-custom pt-6 space-y-4">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="container-custom py-6 space-y-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">I tuoi prodotti</h2>
-        <Link
-          to="/products/create"
-          className={buttonVariants({ variant: "default" })}
-        >
-          Aggiungi un prodotto
-        </Link>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>Aggiungi un prodotto</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Aggiungi un prodotto</DialogTitle>
+              <DialogDescription>
+                Inserisci nome e prezzo ed aggiungi un nuovo prodotto al tuo
+                menu
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onCreateProduct)}
+                className="space-y-4 w-full"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-md font-semibold leading-none tracking-tight">
+                        Nome
+                      </FormLabel>
+                      <FormControl>
+                        <Input className="text-md" placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-md font-semibold leading-none tracking-tight">
+                        Prezzo
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          step="0.01"
+                          type="number"
+                          className="text-md"
+                          placeholder=""
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button className="w-full" type="submit">
+                  Aggiungi
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            name={product.name}
-            price={product.price}
-          />
-        ))}
-      </div>
+      {products.length === 0 && (
+        <h2 className="text-xl font-medium tracking-tight">
+          Non hai ancora aggiunto nessuns prodotto 😐
+        </h2>
+      )}
+      {products.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              user={user}
+              refreshProducts={getProducts}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
