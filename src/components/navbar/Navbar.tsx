@@ -54,11 +54,11 @@ const Navbar = ({ user }: NavbarProps) => {
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Avatar>
+                    <Avatar style={{ cursor: "pointer" }}>
                       <AvatarImage
                         src={user.photoURL === null ? "" : user.photoURL}
                       />
-                      <AvatarFallback>
+                      <AvatarFallback className="font-semibold">
                         {user.email?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
