@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/components/ui/use-toast";
 
 type ProductsProps = {
   user: User | null | undefined;
@@ -46,6 +47,7 @@ const Products = ({ user }: ProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -76,9 +78,23 @@ const Products = ({ user }: ProductsProps) => {
             setIsLoading(false);
             getProducts();
           })
-          .catch(() => setIsLoading(false));
+          .catch(() => {
+            setIsLoading(false);
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente la richiesta",
+            });
+          });
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => {
+        setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la richiesta",
+        });
+      });
   };
 
   const getProducts = () => {
@@ -92,9 +108,23 @@ const Products = ({ user }: ProductsProps) => {
             setProducts(res.data.products);
             setIsLoading(false);
           })
-          .catch(() => setIsLoading(false));
+          .catch(() => {
+            setIsLoading(false);
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente la richiesta",
+            });
+          });
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => {
+        setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la richiesta",
+        });
+      });
   };
 
   if (isLoading) {
@@ -168,7 +198,7 @@ const Products = ({ user }: ProductsProps) => {
       </div>
       {products.length === 0 && (
         <h2 className="text-xl font-medium tracking-tight">
-          Non hai ancora aggiunto nessuns prodotto 😐
+          Non hai ancora aggiunto nessun prodotto 😐
         </h2>
       )}
       {products.length > 0 && (

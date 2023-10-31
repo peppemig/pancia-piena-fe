@@ -16,12 +16,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-//import { Input } from "@/components/ui/input";
-//import { Label } from "@/components/ui/label";
 import { User } from "firebase/auth";
 import productsService from "@/api/productsService";
 import { useState } from "react";
 import LoadingState from "../LoadingState";
+import { useToast } from "@/components/ui/use-toast";
 
 type ProductCardProps = {
   id: string;
@@ -39,6 +38,7 @@ const ProductCard = ({
   refreshProducts,
 }: ProductCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const onDeleteProduct = () => {
     setIsLoading(true);
@@ -48,10 +48,22 @@ const ProductCard = ({
         productsService
           .deleteProduct(token, id)
           .then(() => refreshProducts())
-          .catch(() => setIsLoading(false));
+          .catch(() => {
+            setIsLoading(false);
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente la richiesta",
+            });
+          });
       })
       .catch(() => {
         setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la richiesta",
+        });
       });
   };
 
