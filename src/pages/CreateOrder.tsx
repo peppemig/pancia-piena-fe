@@ -7,36 +7,25 @@ import LoadingState from "@/components/LoadingState";
 import { PlusCircle, MinusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Product, OrderItem } from "../types/types";
 
 type CreateOrderProps = {
   user: User | null | undefined;
 };
 
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  userId: string;
-  category: Category;
-};
-
-enum Category {
-  ANTIPASTO = "ANTIPASTO",
-  PRIMO = "PRIMO",
-  SECONDO = "SECONDO",
-  DOLCE = "DOLCE",
-  BEVANDA = "BEVANDA",
-}
-
-type OrderItem = {
-  productId: string;
-  quantity: number;
-  productName: string;
-  productPrice: number;
-};
-
 const CreateOrder = ({ user }: CreateOrderProps) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -64,6 +53,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
           .getProducts(token)
           .then((res) => {
             setProducts(res.data.products);
+            setFilteredProducts(res.data.products);
             setIsLoading(false);
           })
           .catch(() => {
@@ -128,10 +118,37 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
   return (
     <div className="container-custom py-6 space-y-4">
       <h2 className="text-3xl font-bold tracking-tight">Crea un ordine</h2>
-      {products.length > 0 && (
+      <div className="flex items-center gap-4">
+        <p className="text-lg font-semibold">Filtra prodotti per categoria:</p>
+        <Select
+          onValueChange={(value) => {
+            if (value === "TUTTI") {
+              setFilteredProducts(products);
+              return;
+            }
+            const filter = products.filter(
+              (product) => product.category === value
+            );
+            setFilteredProducts(filter);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Seleziona" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="TUTTI">Tutti</SelectItem>
+            <SelectItem value="ANTIPASTO">Antipasti</SelectItem>
+            <SelectItem value="PRIMO">Primi</SelectItem>
+            <SelectItem value="SECONDO">Secondi</SelectItem>
+            <SelectItem value="DOLCE">Dolci</SelectItem>
+            <SelectItem value="BEVANDA">Bevande</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {filteredProducts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-4">
           <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <div key={product.id}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -162,7 +179,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
                     </Button>
                   </div>
                 </div>
-                {index !== products.length - 1 && (
+                {index !== filteredProducts.length - 1 && (
                   <Separator className="mt-4" />
                 )}
               </div>
@@ -185,6 +202,19 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
               </div>
             ))}
             <Separator />
+            <div className="flex flex-col gap-2">
+              <Label className="text-lg font-medium" htmlFor="numberoTavolo">
+                Numero tavolo
+              </Label>
+              <Input
+                value={tableNumber || ""}
+                onChange={(e) => setTableNumber(parseInt(e.target.value))}
+                min="1"
+                type="number"
+                id="numeroTavolo"
+                placeholder="Inserisci il numero del tavolo"
+              />
+            </div>
             <div className="flex items-center justify-between text-xl font-bold">
               <p>Totale:</p>
               <p>
@@ -195,7 +225,10 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
                 )}
               </p>
             </div>
-            <Button disabled={orderItems.length === 0} className="w-full">
+            <Button
+              disabled={orderItems.length === 0 || tableNumber === null}
+              className="w-full"
+            >
               Effettua ordine
             </Button>
           </div>

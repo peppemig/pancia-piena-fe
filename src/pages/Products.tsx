@@ -33,26 +33,11 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
+import { Product, Category } from "../types/types";
 
 type ProductsProps = {
   user: User | null | undefined;
 };
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  userId: string;
-  category: Category;
-};
-
-enum Category {
-  ANTIPASTO = "ANTIPASTO",
-  PRIMO = "PRIMO",
-  SECONDO = "SECONDO",
-  DOLCE = "DOLCE",
-  BEVANDA = "BEVANDA",
-}
 
 const formSchema = z.object({
   name: z.string().min(1).max(50),
@@ -163,8 +148,8 @@ const Products = ({ user }: ProductsProps) => {
             <DialogHeader>
               <DialogTitle>Aggiungi un prodotto</DialogTitle>
               <DialogDescription>
-                Inserisci nome e prezzo ed aggiungi un nuovo prodotto al tuo
-                menu
+                Inserisci nome, prezzo e categoria ed aggiungi un nuovo prodotto
+                al tuo menu
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -245,10 +230,10 @@ const Products = ({ user }: ProductsProps) => {
         </Dialog>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-lg font-semibold">Filtra per categoria:</p>
+        <p className="text-lg font-semibold">Filtra prodotti per categoria:</p>
         <Select
           onValueChange={(value) => {
-            if (value === "TUTTO") {
+            if (value === "TUTTI") {
               setFilteredProducts(products);
               return;
             }
@@ -262,7 +247,7 @@ const Products = ({ user }: ProductsProps) => {
             <SelectValue placeholder="Seleziona" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="TUTTO">Tutto</SelectItem>
+            <SelectItem value="TUTTI">Tutti</SelectItem>
             <SelectItem value="ANTIPASTO">Antipasti</SelectItem>
             <SelectItem value="PRIMO">Primi</SelectItem>
             <SelectItem value="SECONDO">Secondi</SelectItem>
