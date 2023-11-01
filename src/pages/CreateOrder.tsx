@@ -17,7 +17,16 @@ type Product = {
   name: string;
   price: number;
   userId: string;
+  category: Category;
 };
+
+enum Category {
+  ANTIPASTO = "ANTIPASTO",
+  PRIMO = "PRIMO",
+  SECONDO = "SECONDO",
+  DOLCE = "DOLCE",
+  BEVANDA = "BEVANDA",
+}
 
 type OrderItem = {
   productId: string;
@@ -121,7 +130,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
       <h2 className="text-3xl font-bold tracking-tight">Crea un ordine</h2>
       {products.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-4">
-          <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
+          <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
             {products.map((product, index) => (
               <div key={product.id}>
                 <div className="flex items-center justify-between">

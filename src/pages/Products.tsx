@@ -17,6 +17,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ProductCard from "@/components/products/ProductCard";
 import { useEffect, useState } from "react";
 import productsService from "@/api/productsService";
@@ -36,15 +43,26 @@ type Product = {
   name: string;
   price: number;
   userId: string;
+  category: Category;
 };
+
+enum Category {
+  ANTIPASTO = "ANTIPASTO",
+  PRIMO = "PRIMO",
+  SECONDO = "SECONDO",
+  DOLCE = "DOLCE",
+  BEVANDA = "BEVANDA",
+}
 
 const formSchema = z.object({
   name: z.string().min(1).max(50),
   price: z.coerce.number().min(0.05),
+  category: z.nativeEnum(Category),
 });
 
 const Products = ({ user }: ProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
@@ -54,6 +72,7 @@ const Products = ({ user }: ProductsProps) => {
     defaultValues: {
       name: "",
       price: 0,
+      category: undefined,
     },
   });
 
@@ -106,6 +125,7 @@ const Products = ({ user }: ProductsProps) => {
           .getProducts(token)
           .then((res) => {
             setProducts(res.data.products);
+            setFilteredProducts(res.data.products);
             setIsLoading(false);
           })
           .catch(() => {
@@ -188,6 +208,34 @@ const Products = ({ user }: ProductsProps) => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-md font-semibold leading-none tracking-tight">
+                        Categoria
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleziona una categoria" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ANTIPASTO">Antipasto</SelectItem>
+                          <SelectItem value="PRIMO">Primo</SelectItem>
+                          <SelectItem value="SECONDO">Secondo</SelectItem>
+                          <SelectItem value="DOLCE">Dolce</SelectItem>
+                          <SelectItem value="BEVANDA">Bevanda</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
                 <Button className="w-full" type="submit">
                   Aggiungi
                 </Button>
@@ -196,19 +244,47 @@ const Products = ({ user }: ProductsProps) => {
           </DialogContent>
         </Dialog>
       </div>
-      {products.length === 0 && (
+      <div className="flex items-center gap-4">
+        <p className="text-lg font-semibold">Filtra per categoria:</p>
+        <Select
+          onValueChange={(value) => {
+            if (value === "TUTTO") {
+              setFilteredProducts(products);
+              return;
+            }
+            const filter = products.filter(
+              (product) => product.category === value
+            );
+            setFilteredProducts(filter);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Seleziona" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="TUTTO">Tutto</SelectItem>
+            <SelectItem value="ANTIPASTO">Antipasti</SelectItem>
+            <SelectItem value="PRIMO">Primi</SelectItem>
+            <SelectItem value="SECONDO">Secondi</SelectItem>
+            <SelectItem value="DOLCE">Dolci</SelectItem>
+            <SelectItem value="BEVANDA">Bevande</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {filteredProducts.length === 0 && (
         <h2 className="text-xl font-medium tracking-tight">
           Non hai ancora aggiunto nessun prodotto 😐
         </h2>
       )}
-      {products.length > 0 && (
+      {filteredProducts.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
               name={product.name}
               price={product.price}
+              category={product.category}
               user={user}
               refreshProducts={getProducts}
             />

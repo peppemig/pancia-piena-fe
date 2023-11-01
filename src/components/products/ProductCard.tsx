@@ -38,6 +38,7 @@ type ProductCardProps = {
   id: string;
   name: string;
   price: number;
+  category: string;
   user: User;
   refreshProducts: () => void;
 };
@@ -51,6 +52,7 @@ const ProductCard = ({
   id,
   name,
   price,
+  category,
   user,
   refreshProducts,
 }: ProductCardProps) => {
@@ -132,6 +134,7 @@ const ProductCard = ({
       </CardHeader>
       <CardContent>
         <div className="text-lg font-medium">€{price}</div>
+        <div className="text-lg font-medium">{category}</div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Dialog>
