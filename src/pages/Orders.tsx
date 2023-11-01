@@ -10,16 +10,9 @@ const Orders = ({ user }: OrdersProps) => {
     return <Navigate to="/" replace />;
   }
 
-  const getToken = async () => {
-    const token = await user.getIdToken();
-    console.log(token);
-    return token;
-  };
-
   return (
-    <div className="container-custom">
-      <p>Questi sono gli ordini di {user.email}</p>
-      <button onClick={getToken}>Get token</button>
+    <div className="container-custom py-6 space-y-4">
+      <h2 className="text-3xl font-bold tracking-tight">I tuoi ordini</h2>
     </div>
   );
 };

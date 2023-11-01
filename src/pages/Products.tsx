@@ -34,7 +34,7 @@ type ProductsProps = {
 type Product = {
   id: string;
   name: string;
-  price: string;
+  price: number;
   userId: string;
 };
 

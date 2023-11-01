@@ -29,4 +29,17 @@ const deleteProduct = async (token: string, productId: string) => {
   return response;
 };
 
-export default { getProducts, createProduct, deleteProduct };
+const editProduct = async (
+  token: string,
+  productId: string,
+  product: Product
+) => {
+  const response = await axios.put(
+    `http://localhost:3000/api/v1/products/${productId}`,
+    product,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response;
+};
+
+export default { getProducts, createProduct, deleteProduct, editProduct };
