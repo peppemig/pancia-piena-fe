@@ -13,6 +13,17 @@ export type OrderItem = {
   productPrice: number;
 };
 
+export type OrderRequest = {
+  tableNumber: number;
+  orderItems: OrderItem[];
+};
+
+export type ProductRequest = {
+  name: string;
+  price: number;
+  category: Category;
+};
+
 export enum Category {
   ANTIPASTO = "ANTIPASTO",
   PRIMO = "PRIMO",

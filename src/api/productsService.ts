@@ -1,31 +1,25 @@
 import axios from "axios";
-
-type Product = {
-  name: string;
-  price: number;
-};
+import { Product, ProductRequest } from "../types/types";
+import { API_BASE_URL } from "@/constants/constants";
 
 const getProducts = async (token: string) => {
-  const response = await axios.get("http://localhost:3000/api/v1/products", {
+  const response = await axios.get(`${API_BASE_URL}/products`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response;
 };
 
-const createProduct = async (token: string, product: Product) => {
-  const response = await axios.post(
-    "http://localhost:3000/api/v1/products",
-    product,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+const createProduct = async (token: string, product: ProductRequest) => {
+  const response = await axios.post(`${API_BASE_URL}/products`, product, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response;
 };
 
 const deleteProduct = async (token: string, productId: string) => {
-  const response = await axios.delete(
-    `http://localhost:3000/api/v1/products/${productId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const response = await axios.delete(`${API_BASE_URL}/products/${productId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response;
 };
 
@@ -35,7 +29,7 @@ const editProduct = async (
   product: Product
 ) => {
   const response = await axios.put(
-    `http://localhost:3000/api/v1/products/${productId}`,
+    `${API_BASE_URL}/products/${productId}`,
     product,
     { headers: { Authorization: `Bearer ${token}` } }
   );

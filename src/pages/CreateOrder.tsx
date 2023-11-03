@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Product, OrderItem } from "../types/types";
+import ordersService from "@/api/ordersService";
 
 type CreateOrderProps = {
   user: User | null | undefined;
@@ -37,8 +38,9 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
   }, [user]);
 
   useEffect(() => {
+    console.log(tableNumber);
     console.log(orderItems);
-  }, [orderItems]);
+  }, [orderItems, tableNumber]);
 
   if (!user) {
     return <Navigate to="/" replace />;
@@ -55,6 +57,44 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
             setProducts(res.data.products);
             setFilteredProducts(res.data.products);
             setIsLoading(false);
+          })
+          .catch(() => {
+            setIsLoading(false);
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente la richiesta",
+            });
+          });
+      })
+      .catch(() => {
+        setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Ooops! Qualcosa è andato storto",
+          description: "Prova ad effettuare nuovamente la richiesta",
+        });
+      });
+  };
+
+  const createOrder = () => {
+    if (tableNumber === null) {
+      return;
+    }
+    setIsLoading(true);
+    user
+      .getIdToken()
+      .then((token) => {
+        ordersService
+          .createOrder(token, { tableNumber, orderItems })
+          .then(() => {
+            setIsLoading(false);
+            toast({
+              variant: "default",
+              title: "Ordine creato",
+              description:
+                "Puoi controllare il tuo ordine nella relativa schermata",
+            });
           })
           .catch(() => {
             setIsLoading(false);
@@ -226,7 +266,12 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
               </p>
             </div>
             <Button
-              disabled={orderItems.length === 0 || tableNumber === null}
+              onClick={createOrder}
+              disabled={
+                orderItems.length === 0 ||
+                tableNumber === null ||
+                isNaN(tableNumber)
+              }
               className="w-full"
             >
               Effettua ordine
