@@ -13,6 +13,24 @@ export type OrderItem = {
   productPrice: number;
 };
 
+export type Order = {
+  id: string;
+  tableNumber: number;
+  totalPrice: string;
+  isCompleted: boolean;
+  createdAt: Date;
+  userId: string;
+  orderItems: OrderItemResponse[];
+};
+
+type OrderItemResponse = {
+  id: string;
+  quantity: number;
+  productId: string;
+  orderId: string;
+  product: Product;
+};
+
 export type OrderRequest = {
   tableNumber: number;
   orderItems: OrderItem[];

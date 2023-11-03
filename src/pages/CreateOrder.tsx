@@ -37,11 +37,6 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log(tableNumber);
-    console.log(orderItems);
-  }, [orderItems, tableNumber]);
-
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -88,6 +83,9 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
         ordersService
           .createOrder(token, { tableNumber, orderItems })
           .then(() => {
+            setFilteredProducts(products);
+            setTableNumber(null);
+            setOrderItems([]);
             setIsLoading(false);
             toast({
               variant: "default",

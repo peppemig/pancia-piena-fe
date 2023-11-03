@@ -9,4 +9,11 @@ const createOrder = async (token: string, orderRequest: OrderRequest) => {
   return response;
 };
 
-export default { createOrder };
+const getOrders = async (token: string) => {
+  const response = await axios.get(`${API_BASE_URL}/orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response;
+};
+
+export default { createOrder, getOrders };

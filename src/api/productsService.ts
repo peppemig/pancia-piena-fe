@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Product, ProductRequest } from "../types/types";
+import { ProductRequest } from "../types/types";
 import { API_BASE_URL } from "@/constants/constants";
 
 const getProducts = async (token: string) => {
@@ -26,7 +26,7 @@ const deleteProduct = async (token: string, productId: string) => {
 const editProduct = async (
   token: string,
   productId: string,
-  product: Product
+  product: ProductRequest
 ) => {
   const response = await axios.put(
     `${API_BASE_URL}/products/${productId}`,
