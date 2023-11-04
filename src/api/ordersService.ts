@@ -9,6 +9,13 @@ const getOrders = async (token: string) => {
   return response;
 };
 
+const getCompletedOrders = async (token: string) => {
+  const response = await axios.get(`${API_BASE_URL}/orders/completed`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response;
+};
+
 const createOrder = async (token: string, orderRequest: OrderRequest) => {
   const response = await axios.post(`${API_BASE_URL}/orders`, orderRequest, {
     headers: { Authorization: `Bearer ${token}` },
@@ -32,4 +39,10 @@ const setOrderToCompleted = async (token: string, orderId: string) => {
   return response;
 };
 
-export default { createOrder, getOrders, deleteOrder, setOrderToCompleted };
+export default {
+  createOrder,
+  getOrders,
+  deleteOrder,
+  setOrderToCompleted,
+  getCompletedOrders,
+};

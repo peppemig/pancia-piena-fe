@@ -6,7 +6,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Order } from "@/types/types";
-CheckCircle2;
 import { Button } from "../ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
@@ -18,10 +17,11 @@ import LoadingState from "../LoadingState";
 type OrderCardProps = {
   order: Order;
   user: User;
+  filter: "in-corso" | "completati";
   refreshOrders: () => void;
 };
 
-const OrderCard = ({ order, refreshOrders, user }: OrderCardProps) => {
+const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -97,14 +97,16 @@ const OrderCard = ({ order, refreshOrders, user }: OrderCardProps) => {
           </p>
         ))}
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <Button onClick={onDeleteOrder} variant="outline" size="icon">
-          <XCircle />
-        </Button>
-        <Button onClick={onCompleteOrder} variant="outline" size="icon">
-          <CheckCircle2 />
-        </Button>
-      </CardFooter>
+      {filter === "in-corso" && (
+        <CardFooter className="flex items-center justify-between">
+          <Button onClick={onDeleteOrder} variant="outline" size="icon">
+            <XCircle />
+          </Button>
+          <Button onClick={onCompleteOrder} variant="outline" size="icon">
+            <CheckCircle2 />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

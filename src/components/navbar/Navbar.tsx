@@ -17,7 +17,6 @@ import {
   ChefHat,
   PlusCircleIcon,
   LogOut,
-  User2,
   AreaChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -91,10 +90,6 @@ const Navbar = ({ user }: NavbarProps) => {
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <User2 className="mr-2 h-4 w-4" />
-                      <span>Profilo</span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={onLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Esci</span>

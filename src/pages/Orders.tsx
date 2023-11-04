@@ -25,7 +25,7 @@ const Orders = ({ user }: OrdersProps) => {
     if (user) {
       getOrders();
     }
-  }, [user]);
+  }, [user, ordersFilter]);
 
   if (!user) {
     return <Navigate to="/" replace />;
@@ -36,19 +36,24 @@ const Orders = ({ user }: OrdersProps) => {
     user
       .getIdToken()
       .then((token) => {
-        ordersService
-          .getOrders(token)
+        const fetchOrders =
+          ordersFilter === "in-corso"
+            ? ordersService.getOrders(token)
+            : ordersService.getCompletedOrders(token);
+
+        fetchOrders
           .then((res) => {
             setOrders(res.data.orders);
-            setIsLoading(false);
           })
           .catch(() => {
-            setIsLoading(false);
             toast({
               variant: "destructive",
               title: "Ooops! Qualcosa è andato storto",
               description: "Prova ad effettuare nuovamente la richiesta",
             });
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       })
       .catch(() => {
@@ -69,10 +74,20 @@ const Orders = ({ user }: OrdersProps) => {
     <div className="container-custom py-6 space-y-4">
       <h2 className="text-3xl font-bold tracking-tight">I tuoi ordini</h2>
       <div className="flex items-center gap-2">
-        <Button variant={ordersFilter === "in-corso" ? "default" : "secondary"}>
+        <Button
+          onClick={() => {
+            if (ordersFilter === "in-corso") return;
+            setOrdersFilter("in-corso");
+          }}
+          variant={ordersFilter === "in-corso" ? "default" : "secondary"}
+        >
           In corso
         </Button>
         <Button
+          onClick={() => {
+            if (ordersFilter === "completati") return;
+            setOrdersFilter("completati");
+          }}
           variant={ordersFilter === "completati" ? "default" : "secondary"}
         >
           Completati
@@ -87,6 +102,7 @@ const Orders = ({ user }: OrdersProps) => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {orders.map((order) => (
             <OrderCard
+              filter={ordersFilter}
               key={order.id}
               order={order}
               refreshOrders={getOrders}
