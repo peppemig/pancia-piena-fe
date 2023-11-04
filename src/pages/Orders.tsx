@@ -6,14 +6,18 @@ import { useToast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
 import ordersService from "@/api/ordersService";
 import OrderCard from "@/components/orders/OrderCard";
+import { Button } from "@/components/ui/button";
 
 type OrdersProps = {
   user: User | null | undefined;
 };
 
+type OrderFilter = "in-corso" | "completati";
+
 const Orders = ({ user }: OrdersProps) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [ordersFilter, setOrdersFilter] = useState<OrderFilter>("in-corso");
 
   const { toast } = useToast();
 
@@ -64,6 +68,16 @@ const Orders = ({ user }: OrdersProps) => {
   return (
     <div className="container-custom py-6 space-y-4">
       <h2 className="text-3xl font-bold tracking-tight">I tuoi ordini</h2>
+      <div className="flex items-center gap-2">
+        <Button variant={ordersFilter === "in-corso" ? "default" : "secondary"}>
+          In corso
+        </Button>
+        <Button
+          variant={ordersFilter === "completati" ? "default" : "secondary"}
+        >
+          Completati
+        </Button>
+      </div>
       {orders.length === 0 && (
         <h2 className="text-xl font-medium tracking-tight">
           Non hai ancora nessun ordine 😐
@@ -72,7 +86,12 @@ const Orders = ({ user }: OrdersProps) => {
       {orders.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {orders.map((order) => (
-            <OrderCard order={order} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              refreshOrders={getOrders}
+              user={user}
+            />
           ))}
         </div>
       )}

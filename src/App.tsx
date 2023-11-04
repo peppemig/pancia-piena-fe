@@ -14,8 +14,6 @@ import CreateOrder from "./pages/CreateOrder";
 
 function App() {
   const [user, loading] = useAuthState(auth);
-  //console.log("LOADING: " + loading);
-  //console.log("USER: " + JSON.stringify(user));
 
   if (loading) {
     return <LoadingState />;
