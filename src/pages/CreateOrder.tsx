@@ -18,23 +18,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Product, OrderItem } from "../types/types";
 import ordersService from "@/api/ordersService";
+import { io, Socket } from "socket.io-client";
 
 type CreateOrderProps = {
   user: User | null | undefined;
 };
 
 const CreateOrder = ({ user }: CreateOrderProps) => {
+  const URL = "http://localhost:3000";
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
       getProducts();
     }
+  }, [user]);
+
+  useEffect(() => {
+    let socket: Socket;
+
+    if (user) {
+      const connectToSocket = async () => {
+        const token = await user.getIdToken();
+        socket = io(URL, {
+          autoConnect: false,
+          query: { token: token },
+        });
+
+        socket.connect();
+        setSocket(socket);
+      };
+
+      connectToSocket();
+    }
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
   }, [user]);
 
   if (!user) {
@@ -83,6 +111,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
         ordersService
           .createOrder(token, { tableNumber, orderItems })
           .then(() => {
+            socket?.emit("order-created");
             setFilteredProducts(products);
             setTableNumber(null);
             setOrderItems([]);
