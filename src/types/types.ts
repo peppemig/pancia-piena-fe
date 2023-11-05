@@ -20,7 +20,13 @@ export type Order = {
   isCompleted: boolean;
   createdAt: Date;
   userId: string;
-  orderItems: OrderItemResponse[];
+  orderItems?: OrderItemResponse[];
+};
+
+export type Stats = {
+  monthlyStats: { _count: number; _sum: { totalPrice: number } };
+  dailyOrders: number;
+  last5Orders: Order[];
 };
 
 type OrderItemResponse = {
