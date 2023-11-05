@@ -5,6 +5,16 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Order } from "@/types/types";
 import { Button } from "../ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -99,9 +109,37 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
       </CardContent>
       {filter === "in-corso" && (
         <CardFooter className="flex items-center justify-between">
-          <Button onClick={onDeleteOrder} variant="outline" size="icon">
-            <XCircle />
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <XCircle />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Conferma</DialogTitle>
+                <DialogDescription>
+                  Sei sicuro di voler eliminare quest'ordine?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <div className="flex items-center justify-between w-full">
+                  <DialogClose asChild>
+                    <Button variant="outline">Annulla</Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      onClick={onDeleteOrder}
+                      variant="destructive"
+                      type="submit"
+                    >
+                      Si
+                    </Button>
+                  </DialogClose>
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Button onClick={onCompleteOrder} variant="outline" size="icon">
             <CheckCircle2 />
           </Button>

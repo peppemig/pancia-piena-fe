@@ -8,6 +8,7 @@ import ordersService from "@/api/ordersService";
 import OrderCard from "@/components/orders/OrderCard";
 import { Button } from "@/components/ui/button";
 import { io, Socket } from "socket.io-client";
+import { ORIGIN_URL } from "@/constants/constants";
 
 type OrdersProps = {
   user: User | null | undefined;
@@ -16,7 +17,6 @@ type OrdersProps = {
 type OrderFilter = "in-corso" | "completati";
 
 const Orders = ({ user }: OrdersProps) => {
-  const URL = "http://localhost:3000";
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [ordersFilter, setOrdersFilter] = useState<OrderFilter>("in-corso");
@@ -42,7 +42,7 @@ const Orders = ({ user }: OrdersProps) => {
     if (user) {
       const connectToSocket = async () => {
         const token = await user.getIdToken();
-        socket = io(URL, {
+        socket = io(ORIGIN_URL, {
           autoConnect: false,
           query: { token: token },
         });

@@ -19,13 +19,13 @@ import { Label } from "@/components/ui/label";
 import { Product, OrderItem } from "../types/types";
 import ordersService from "@/api/ordersService";
 import { io, Socket } from "socket.io-client";
+import { ORIGIN_URL } from "@/constants/constants";
 
 type CreateOrderProps = {
   user: User | null | undefined;
 };
 
 const CreateOrder = ({ user }: CreateOrderProps) => {
-  const URL = "http://localhost:3000";
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
@@ -46,7 +46,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
     if (user) {
       const connectToSocket = async () => {
         const token = await user.getIdToken();
-        socket = io(URL, {
+        socket = io(ORIGIN_URL, {
           autoConnect: false,
           query: { token: token },
         });
