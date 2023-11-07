@@ -1,7 +1,5 @@
 import { Order } from "@/types/types";
-import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
 import ordersService from "@/api/ordersService";
@@ -9,14 +7,12 @@ import OrderCard from "@/components/orders/OrderCard";
 import { Button } from "@/components/ui/button";
 import { io, Socket } from "socket.io-client";
 import { ORIGIN_URL } from "@/constants/constants";
-
-type OrdersProps = {
-  user: User | null | undefined;
-};
+import { useAuthState } from "@/providers/AuthProvider";
 
 type OrderFilter = "in-corso" | "completati";
 
-const Orders = ({ user }: OrdersProps) => {
+const Orders = () => {
+  const { user } = useAuthState();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [ordersFilter, setOrdersFilter] = useState<OrderFilter>("in-corso");
@@ -25,9 +21,7 @@ const Orders = ({ user }: OrdersProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      getOrders();
-    }
+    getOrders();
   }, [user, ordersFilter]);
 
   useEffect(() => {
@@ -61,13 +55,9 @@ const Orders = ({ user }: OrdersProps) => {
     };
   }, [user]);
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
   const getOrders = () => {
     setIsLoading(true);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         const fetchOrders =
@@ -140,7 +130,7 @@ const Orders = ({ user }: OrdersProps) => {
               key={order.id}
               order={order}
               refreshOrders={getOrders}
-              user={user}
+              user={user!}
             />
           ))}
         </div>

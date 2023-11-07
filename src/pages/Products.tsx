@@ -1,5 +1,5 @@
-import { User } from "firebase/auth";
-import { Navigate } from "react-router-dom";
+//import { User } from "firebase/auth";
+//import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,10 +34,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Product, Category } from "../types/types";
+import { useAuthState } from "@/providers/AuthProvider";
 
-type ProductsProps = {
-  user: User | null | undefined;
-};
+//type ProductsProps = {
+//  user: User | null | undefined;
+//};
 
 const formSchema = z.object({
   name: z.string().min(1).max(50),
@@ -45,7 +46,8 @@ const formSchema = z.object({
   category: z.nativeEnum(Category),
 });
 
-const Products = ({ user }: ProductsProps) => {
+const Products = () => {
+  const { user } = useAuthState();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,18 +64,12 @@ const Products = ({ user }: ProductsProps) => {
   });
 
   useEffect(() => {
-    if (user) {
-      getProducts();
-    }
+    getProducts();
   }, [user]);
-
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
 
   const onCreateProduct = (values: z.infer<typeof formSchema>) => {
     setOpen(false);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         productsService
@@ -103,7 +99,7 @@ const Products = ({ user }: ProductsProps) => {
 
   const getProducts = () => {
     setIsLoading(true);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         productsService
@@ -270,7 +266,7 @@ const Products = ({ user }: ProductsProps) => {
               name={product.name}
               price={product.price}
               category={product.category}
-              user={user}
+              user={user!}
               refreshProducts={getProducts}
             />
           ))}

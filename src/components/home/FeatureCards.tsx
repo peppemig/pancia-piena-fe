@@ -1,6 +1,5 @@
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Clock, UtensilsCrossed, AreaChart } from "lucide-react";
-//import animation from "../../assets/hero-animation.json";
 
 const FeatureCards = () => {
   return (

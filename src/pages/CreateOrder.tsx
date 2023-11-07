@@ -1,7 +1,5 @@
 import productsService from "@/api/productsService";
-import { User } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
 import { PlusCircle, MinusCircle } from "lucide-react";
@@ -20,12 +18,10 @@ import { Product, OrderItem } from "../types/types";
 import ordersService from "@/api/ordersService";
 import { io, Socket } from "socket.io-client";
 import { ORIGIN_URL } from "@/constants/constants";
+import { useAuthState } from "@/providers/AuthProvider";
 
-type CreateOrderProps = {
-  user: User | null | undefined;
-};
-
-const CreateOrder = ({ user }: CreateOrderProps) => {
+const CreateOrder = () => {
+  const { user } = useAuthState();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
@@ -35,28 +31,24 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      getProducts();
-    }
+    getProducts();
   }, [user]);
 
   useEffect(() => {
     let socket: Socket;
 
-    if (user) {
-      const connectToSocket = async () => {
-        const token = await user.getIdToken();
-        socket = io(ORIGIN_URL, {
-          autoConnect: false,
-          query: { token: token },
-        });
+    const connectToSocket = async () => {
+      const token = await user!.getIdToken();
+      socket = io(ORIGIN_URL, {
+        autoConnect: false,
+        query: { token: token },
+      });
 
-        socket.connect();
-        setSocket(socket);
-      };
+      socket.connect();
+      setSocket(socket);
+    };
 
-      connectToSocket();
-    }
+    connectToSocket();
 
     return () => {
       if (socket) {
@@ -65,13 +57,9 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
     };
   }, [user]);
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
   const getProducts = () => {
     setIsLoading(true);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         productsService
@@ -105,7 +93,7 @@ const CreateOrder = ({ user }: CreateOrderProps) => {
       return;
     }
     setIsLoading(true);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         ordersService

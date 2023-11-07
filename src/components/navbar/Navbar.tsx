@@ -24,15 +24,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Moon, Sun } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useTheme } from "../ThemeProvider";
+import { useTheme } from "../../providers/ThemeProvider";
 import { logOut } from "../../config/firebaseConfig";
-import { User } from "firebase/auth";
+import { useAuthState } from "@/providers/AuthProvider";
 
-type NavbarProps = {
-  user: User | null | undefined;
-};
-
-const Navbar = ({ user }: NavbarProps) => {
+const Navbar = () => {
+  const auth = useAuthState();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -49,16 +46,18 @@ const Navbar = ({ user }: NavbarProps) => {
         </Link>
         <NavigationMenu>
           <NavigationMenuList className="flex gap-1">
-            {user ? (
+            {auth.state === "loaded" && auth.isAuthentication ? (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar style={{ cursor: "pointer" }}>
                       <AvatarImage
-                        src={user.photoURL === null ? "" : user.photoURL}
+                        src={
+                          auth.user.photoURL === null ? "" : auth.user.photoURL
+                        }
                       />
                       <AvatarFallback className="font-semibold">
-                        {user.email?.charAt(0).toUpperCase()}
+                        {auth.user.email?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>

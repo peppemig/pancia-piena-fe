@@ -3,38 +3,58 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Navbar from "./components/navbar/Navbar";
 import Register from "./pages/Register";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "./config/firebaseConfig";
 import { Toaster } from "@/components/ui/toaster";
-import LoadingState from "./components/LoadingState";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Dashboard from "./pages/Dashboard";
 import CreateOrder from "./pages/CreateOrder";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const [user, loading] = useAuthState(auth);
-
-  if (loading) {
-    return <LoadingState />;
-  }
-
   return (
     <BrowserRouter>
       <Toaster />
-      <Navbar user={user} />
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home user={user} />} />
+        <Route path="/" element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="products">
-          <Route path="list" element={<Products user={user} />} />
+          <Route
+            path="list"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
         </Route>
         <Route path="orders">
-          <Route path="list" element={<Orders user={user} />} />
-          <Route path="create" element={<CreateOrder user={user} />} />
+          <Route
+            path="list"
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="create"
+            element={
+              <ProtectedRoute>
+                <CreateOrder />
+              </ProtectedRoute>
+            }
+          />
         </Route>
-        <Route path="dashboard" element={<Dashboard user={user} />} />
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

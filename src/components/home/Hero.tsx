@@ -3,13 +3,16 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Lottie from "lottie-react";
 import heroAnimation from "../../assets/hero-animation.json";
-import { User } from "firebase/auth";
+import { useAuthState } from "@/providers/AuthProvider";
+import LoadingState from "../LoadingState";
 
-type HeroProps = {
-  user: User | null | undefined;
-};
+const Hero = () => {
+  const auth = useAuthState();
 
-const Hero = ({ user }: HeroProps) => {
+  if (auth.state === "loading") {
+    return <LoadingState />;
+  }
+
   return (
     <section className="container-custom flex flex-col gap-4 pb-12 pt-4 text-center lg:items-center lg:gap-8 lg:py-20">
       <div className="flex flex-1 flex-col items-center gap-4 text-center lg:gap-8">
@@ -19,7 +22,7 @@ const Hero = ({ user }: HeroProps) => {
             Rivoluziona la gestione degli ordini nel tuo ristorante
           </h2>
         </div>
-        {user ? (
+        {auth.state === "loaded" && auth.isAuthentication ? (
           <Link
             to="/orders/list"
             className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}

@@ -1,5 +1,3 @@
-import { User } from "firebase/auth";
-import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { ResponsiveContainer, Bar, BarChart, XAxis, YAxis } from "recharts";
@@ -11,6 +9,7 @@ import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import RecentOrderRow from "@/components/dashboard/RecentOrderRow";
 import { Stats } from "@/types/types";
+import { useAuthState } from "@/providers/AuthProvider";
 
 const data = [
   {
@@ -63,11 +62,8 @@ const data = [
   },
 ];
 
-type DashboardProps = {
-  user: User | null | undefined;
-};
-
-const Dashboard = ({ user }: DashboardProps) => {
+const Dashboard = () => {
+  const { user } = useAuthState();
   const [year, setYear] = useState(new Date().getUTCFullYear());
   const [month, setMonth] = useState(new Date().getUTCMonth() + 1);
   const [day, setDay] = useState(new Date().getUTCDate());
@@ -80,18 +76,12 @@ const Dashboard = ({ user }: DashboardProps) => {
   const formattedDayMonthYear = format(date, "d MMMM yyyy", { locale: it });
 
   useEffect(() => {
-    if (user) {
-      getStats();
-    }
-  }, []);
-
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+    getStats();
+  }, [user]);
 
   const getStats = () => {
     setIsLoading(true);
-    user
+    user!
       .getIdToken()
       .then((token) => {
         statsService
