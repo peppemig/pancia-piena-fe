@@ -12,6 +12,16 @@ import { Stats } from "@/types/types";
 import { useAuthState } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 const checkSameDay = (firstDate: Date, secondDate: Date) => {
   return (
     firstDate.getDate() === secondDate.getDate() &&
@@ -22,9 +32,17 @@ const checkSameDay = (firstDate: Date, secondDate: Date) => {
 
 const Dashboard = () => {
   const { user } = useAuthState();
-  const [year, setYear] = useState(new Date().getUTCFullYear());
-  const [month, setMonth] = useState(new Date().getUTCMonth() + 1);
-  const [day, setDay] = useState(new Date().getUTCDate());
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(
+    new Date()
+  );
+  //const [year, setYear] = useState(new Date().getUTCFullYear());
+  //const [month, setMonth] = useState(new Date().getUTCMonth() + 1);
+  //const [day, setDay] = useState(new Date().getUTCDate());
+
+  const year = calendarDate!.getFullYear();
+  const month = calendarDate!.getMonth() + 1;
+  const day = calendarDate!.getDate();
+
   const [stats, setStats] = useState<Stats>();
   const [ordersForTheDay, setOrdersForTheDay] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,16 +55,16 @@ const Dashboard = () => {
 
   useEffect(() => {
     getStats();
-  }, [user]);
+  }, [user, month, year]);
 
   useEffect(() => {
     if (stats) {
       const dayOrders = stats.graphStats.find(
-        (item) => checkSameDay(new Date(item.day), new Date()) === true
+        (item) => checkSameDay(new Date(item.day), calendarDate!) === true
       );
       setOrdersForTheDay(dayOrders?.ordersForTheDay);
     }
-  }, [stats]);
+  }, [stats, calendarDate]);
 
   const getStats = () => {
     setIsLoading(true);
@@ -84,7 +102,36 @@ const Dashboard = () => {
 
   return (
     <div className="container-custom py-6 space-y-4">
-      <h2 className="text-3xl font-bold tracking-tight">La tua dashboard</h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
+        <h2 className="text-3xl font-bold tracking-tight">La tua dashboard</h2>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !calendarDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {calendarDate ? (
+                format(calendarDate, "PPP", { locale: it })
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              locale={it}
+              mode="single"
+              selected={calendarDate}
+              onSelect={setCalendarDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
       {stats && Object.keys(stats).length > 0 && (
         <>
           <div className="grid gap-4 md:grid-cols-3">
