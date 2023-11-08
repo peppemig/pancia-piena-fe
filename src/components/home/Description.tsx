@@ -8,6 +8,14 @@ const Description = () => {
         Cosa aspetti?
       </h1>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="items-center justify-center flex md:hidden">
+          {" "}
+          <Lottie
+            animationData={swipeAnimation}
+            loop={true}
+            style={{ maxWidth: "700px", maxHeight: "700px" }}
+          />
+        </div>
         <div className="gap-8 flex items-center justify-center flex-col text-xl">
           <p>
             La soluzione innovativa per rivoluzionare la gestione degli ordini
@@ -27,7 +35,7 @@ const Description = () => {
             culinarie personalizzate per i tuoi clienti.
           </p>
         </div>
-        <div className="flex items-center justify-center">
+        <div className="items-center justify-center hidden md:flex">
           {" "}
           <Lottie
             animationData={swipeAnimation}

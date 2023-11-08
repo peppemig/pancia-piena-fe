@@ -10,57 +10,15 @@ import { it } from "date-fns/locale";
 import RecentOrderRow from "@/components/dashboard/RecentOrderRow";
 import { Stats } from "@/types/types";
 import { useAuthState } from "@/providers/AuthProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 
-const data = [
-  {
-    name: "Jan",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Feb",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Mar",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Apr",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "May",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jun",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jul",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Aug",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Sep",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Oct",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Nov",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Dec",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-];
+const checkSameDay = (firstDate: Date, secondDate: Date) => {
+  return (
+    firstDate.getDate() === secondDate.getDate() &&
+    firstDate.getMonth() === secondDate.getMonth() &&
+    firstDate.getFullYear() === secondDate.getFullYear()
+  );
+};
 
 const Dashboard = () => {
   const { user } = useAuthState();
@@ -68,8 +26,10 @@ const Dashboard = () => {
   const [month, setMonth] = useState(new Date().getUTCMonth() + 1);
   const [day, setDay] = useState(new Date().getUTCDate());
   const [stats, setStats] = useState<Stats>();
+  const [ordersForTheDay, setOrdersForTheDay] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { theme } = useTheme();
 
   const date = new Date(year, month - 1, day);
   const formattedMonthYear = format(date, "MMMM yyyy", { locale: it });
@@ -79,13 +39,22 @@ const Dashboard = () => {
     getStats();
   }, [user]);
 
+  useEffect(() => {
+    if (stats) {
+      const dayOrders = stats.graphStats.find(
+        (item) => checkSameDay(new Date(item.day), new Date()) === true
+      );
+      setOrdersForTheDay(dayOrders?.ordersForTheDay);
+    }
+  }, [stats]);
+
   const getStats = () => {
     setIsLoading(true);
     user!
       .getIdToken()
       .then((token) => {
         statsService
-          .getStats(token, year, month, day)
+          .getStats(token, year, month)
           .then((res) => {
             setStats(res.data.stats);
             setIsLoading(false);
@@ -123,44 +92,68 @@ const Dashboard = () => {
               type="currency"
               label="Totale guadagni"
               desc={formattedMonthYear}
-              value={stats.monthlyStats._sum.totalPrice}
+              value={stats.monthTotal._sum.totalPrice}
             />
             <DashboardCard
               type="stat"
               label="Totale ordini"
               desc={formattedMonthYear}
-              value={stats.monthlyStats._count}
+              value={stats.graphStats.reduce(
+                (total, item) => total + item.ordersForTheDay,
+                0
+              )}
             />
             <DashboardCard
               type="stat"
               label="Ordini oggi"
               desc={formattedDayMonthYear}
-              value={stats.dailyOrders}
+              value={ordersForTheDay || 0}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-2 lg:col-span-4">
               <CardHeader>
-                <CardTitle>Panoramica (TO-DO)</CardTitle>
+                <CardTitle>Panoramica mensile</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="95%" height={450}>
-                  <BarChart data={data}>
+                  <BarChart data={stats.graphStats}>
                     <XAxis
-                      dataKey="name"
-                      stroke="#888888"
+                      label={{
+                        value: "Giorno",
+                        position: "insideBottomRight",
+                        dy: 10,
+                      }}
+                      dataKey="day"
+                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
+                      tickFormatter={(value) =>
+                        `${
+                          new Date(value).getDate() +
+                          "-" +
+                          (new Date(value).getMonth() + 1)
+                        }`
+                      }
                     />
                     <YAxis
-                      stroke="#888888"
+                      label={{
+                        value: "N. ordini",
+                        position: "insideLeft",
+                        angle: -90,
+                      }}
+                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
-                      tickFormatter={(value) => `€${value}`}
+                      tickFormatter={(value) => `${value}`}
                     />
-                    <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="ordersForTheDay"
+                      fill={theme === "dark" ? "#1E293B" : "#F1F5F9"}
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>

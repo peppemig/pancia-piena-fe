@@ -24,9 +24,14 @@ export type Order = {
 };
 
 export type Stats = {
-  monthlyStats: { _count: number; _sum: { totalPrice: number } };
-  dailyOrders: number;
+  graphStats: OrderForDay[];
+  monthTotal: { _sum: { totalPrice: number } };
   last5Orders: Order[];
+};
+
+export type OrderForDay = {
+  day: Date;
+  ordersForTheDay: number;
 };
 
 type OrderItemResponse = {
