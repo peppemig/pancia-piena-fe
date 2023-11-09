@@ -1,5 +1,3 @@
-//import { User } from "firebase/auth";
-//import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -65,6 +63,7 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
+    console.log("GETTING PRODS");
   }, [user]);
 
   const onCreateProduct = (values: z.infer<typeof formSchema>) => {

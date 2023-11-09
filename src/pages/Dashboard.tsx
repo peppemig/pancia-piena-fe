@@ -139,7 +139,7 @@ const Dashboard = () => {
               type="currency"
               label="Totale guadagni"
               desc={formattedMonthYear}
-              value={stats.monthTotal._sum.totalPrice}
+              value={stats.monthTotal._sum.totalPrice || 0}
             />
             <DashboardCard
               type="stat"
@@ -163,46 +163,50 @@ const Dashboard = () => {
                 <CardTitle>Panoramica mensile</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="95%" height={450}>
-                  <BarChart data={stats.graphStats}>
-                    <XAxis
-                      label={{
-                        value: "Giorno",
-                        position: "insideBottomRight",
-                        dy: 10,
-                      }}
-                      dataKey="day"
-                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) =>
-                        `${
-                          new Date(value).getDate() +
-                          "-" +
-                          (new Date(value).getMonth() + 1)
-                        }`
-                      }
-                    />
-                    <YAxis
-                      label={{
-                        value: "N. ordini",
-                        position: "insideLeft",
-                        angle: -90,
-                      }}
-                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) => `${value}`}
-                    />
-                    <Bar
-                      dataKey="ordersForTheDay"
-                      fill={theme === "dark" ? "#1E293B" : "#F1F5F9"}
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                {stats.graphStats.length > 0 ? (
+                  <ResponsiveContainer width="95%" height={450}>
+                    <BarChart data={stats.graphStats}>
+                      <XAxis
+                        label={{
+                          value: "Giorno",
+                          position: "insideBottomRight",
+                          dy: 10,
+                        }}
+                        dataKey="day"
+                        stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) =>
+                          `${
+                            new Date(value).getDate() +
+                            "-" +
+                            (new Date(value).getMonth() + 1)
+                          }`
+                        }
+                      />
+                      <YAxis
+                        label={{
+                          value: "N. ordini",
+                          position: "insideLeft",
+                          angle: -90,
+                        }}
+                        stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${value}`}
+                      />
+                      <Bar
+                        dataKey="ordersForTheDay"
+                        fill={theme === "dark" ? "#1E293B" : "#F1F5F9"}
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div>Nessun ordine questo mese</div>
+                )}
               </CardContent>
             </Card>
             <Card className="col-span-2 lg:col-span-3 h-fit">

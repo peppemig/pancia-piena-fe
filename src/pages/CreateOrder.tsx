@@ -200,100 +200,107 @@ const CreateOrder = () => {
           </SelectContent>
         </Select>
       </div>
-      {filteredProducts.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-4">
-          <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
-            {filteredProducts.map((product, index) => (
-              <div key={product.id}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xl font-bold">{product.name}</p>
-                    <p className="text-lg font-medium">€{product.price}</p>
-                  </div>
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      disabled={
-                        !orderItems.some(
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-4">
+        {filteredProducts.length > 0 ? (
+          <>
+            <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
+              {filteredProducts.map((product, index) => (
+                <div key={product.id}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xl font-bold">{product.name}</p>
+                      <p className="text-lg font-medium">€{product.price}</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-4">
+                      <Button
+                        disabled={
+                          !orderItems.some(
+                            (item) => item.productId === product.id
+                          )
+                        }
+                        variant="ghost"
+                        onClick={() => removeQuantity(product)}
+                      >
+                        <MinusCircle size={30} />
+                      </Button>
+                      <p className="text-lg font-medium">
+                        {orderItems.find(
                           (item) => item.productId === product.id
-                        )
-                      }
-                      variant="ghost"
-                      onClick={() => removeQuantity(product)}
-                    >
-                      <MinusCircle size={30} />
-                    </Button>
-                    <p className="text-lg font-medium">
-                      {orderItems.find((item) => item.productId === product.id)
-                        ?.quantity ?? 0}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      onClick={() => addQuantity(product)}
-                    >
-                      <PlusCircle size={30} />
-                    </Button>
+                        )?.quantity ?? 0}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        onClick={() => addQuantity(product)}
+                      >
+                        <PlusCircle size={30} />
+                      </Button>
+                    </div>
                   </div>
+                  {index !== filteredProducts.length - 1 && (
+                    <Separator className="mt-4" />
+                  )}
                 </div>
-                {index !== filteredProducts.length - 1 && (
-                  <Separator className="mt-4" />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="sticky mt-2 lg:mt-0 top-6 h-fit col-span-1 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
-            <p className="text-xl font-bold">Riepilogo ordine</p>
-            {orderItems.map((item) => (
-              <div
-                key={item.productId}
-                className="flex items-center justify-between"
-              >
-                <div className="flex flex-col">
-                  <p className="text-lg font-medium">{item.productName}</p>
-                  <p className="text-md">Quantità: {item.quantity}</p>
-                </div>
-                <p className="text-lg font-bold">
-                  €{item.quantity * item.productPrice}
-                </p>
-              </div>
-            ))}
-            <Separator />
-            <div className="flex flex-col gap-2">
-              <Label className="text-lg font-medium" htmlFor="numberoTavolo">
-                Numero tavolo
-              </Label>
-              <Input
-                value={tableNumber || ""}
-                onChange={(e) => setTableNumber(parseInt(e.target.value))}
-                min="1"
-                type="number"
-                id="numeroTavolo"
-                placeholder="Inserisci il numero del tavolo"
-              />
+              ))}
             </div>
-            <div className="flex items-center justify-between text-xl font-bold">
-              <p>Totale:</p>
-              <p>
-                €
-                {orderItems.reduce(
-                  (total, item) => total + item.quantity * item.productPrice,
-                  0
-                )}
+          </>
+        ) : (
+          <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
+            Nessun prodotto trovato
+          </div>
+        )}
+        <div className="sticky mt-2 lg:mt-0 top-6 h-fit col-span-1 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
+          <p className="text-xl font-bold">Riepilogo ordine</p>
+          {orderItems.map((item) => (
+            <div
+              key={item.productId}
+              className="flex items-center justify-between"
+            >
+              <div className="flex flex-col">
+                <p className="text-lg font-medium">{item.productName}</p>
+                <p className="text-md">Quantità: {item.quantity}</p>
+              </div>
+              <p className="text-lg font-bold">
+                €{item.quantity * item.productPrice}
               </p>
             </div>
-            <Button
-              onClick={createOrder}
-              disabled={
-                orderItems.length === 0 ||
-                tableNumber === null ||
-                isNaN(tableNumber)
-              }
-              className="w-full"
-            >
-              Effettua ordine
-            </Button>
+          ))}
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <Label className="text-lg font-medium" htmlFor="numberoTavolo">
+              Numero tavolo
+            </Label>
+            <Input
+              value={tableNumber || ""}
+              onChange={(e) => setTableNumber(parseInt(e.target.value))}
+              min="1"
+              type="number"
+              id="numeroTavolo"
+              placeholder="Inserisci il numero del tavolo"
+            />
           </div>
+          <div className="flex items-center justify-between text-xl font-bold">
+            <p>Totale:</p>
+            <p>
+              €
+              {orderItems.reduce(
+                (total, item) => total + item.quantity * item.productPrice,
+                0
+              )}
+            </p>
+          </div>
+          <Button
+            onClick={createOrder}
+            disabled={
+              orderItems.length === 0 ||
+              tableNumber === null ||
+              isNaN(tableNumber)
+            }
+            className="w-full"
+          >
+            Effettua ordine
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
