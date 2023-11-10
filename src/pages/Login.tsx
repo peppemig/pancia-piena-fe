@@ -47,13 +47,31 @@ const Login = () => {
           description: "Sei pronto per una giornata piena di ordini? 😊",
         });
       })
-      .catch(() =>
-        toast({
-          variant: "destructive",
-          title: "Ooops! Qualcosa è andato storto",
-          description: "Prova ad effettuare nuovamente l'accesso",
-        })
-      );
+      .catch((error) => {
+        switch (error.code) {
+          case "auth/invalid-login-credentials":
+            toast({
+              variant: "destructive",
+              title: "Attenzione",
+              description: "Credenziali non valide",
+            });
+            break;
+          case "auth/too-many-requests":
+            toast({
+              variant: "destructive",
+              title: "Attenzione",
+              description:
+                "Questo account è temporaneamente disabilitato a causa di numerosi tentativi di accesso falliti",
+            });
+            break;
+          default:
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente l'accesso",
+            });
+        }
+      });
   };
 
   const onGoogleSignIn = () => {

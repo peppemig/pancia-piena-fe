@@ -63,7 +63,6 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
-    console.log("GETTING PRODS");
   }, [user]);
 
   const onCreateProduct = (values: z.infer<typeof formSchema>) => {

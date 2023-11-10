@@ -2,7 +2,6 @@ import productsService from "@/api/productsService";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
-import { PlusCircle, MinusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +18,7 @@ import ordersService from "@/api/ordersService";
 import { io, Socket } from "socket.io-client";
 import { ORIGIN_URL } from "@/constants/constants";
 import { useAuthState } from "@/providers/AuthProvider";
+import OrderItemRow from "@/components/create-order/OrderItemRow";
 
 const CreateOrder = () => {
   const { user } = useAuthState();
@@ -29,6 +29,8 @@ const CreateOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
+
+  const categories = ["ANTIPASTO", "PRIMO", "SECONDO", "DOLCE", "BEVANDA"];
 
   useEffect(() => {
     getProducts();
@@ -204,43 +206,25 @@ const CreateOrder = () => {
         {filteredProducts.length > 0 ? (
           <>
             <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
-              {filteredProducts.map((product, index) => (
-                <div key={product.id}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xl font-bold">{product.name}</p>
-                      <p className="text-lg font-medium">€{product.price}</p>
+              {categories.map(
+                (cat) =>
+                  filteredProducts.some((prod) => prod.category === cat) && (
+                    <div key={cat}>
+                      <h2>{cat}</h2>
+                      {filteredProducts
+                        .filter((prod) => prod.category === cat)
+                        .map((fprod) => (
+                          <OrderItemRow
+                            key={fprod.id}
+                            product={fprod}
+                            orderItems={orderItems}
+                            addQty={addQuantity}
+                            removeQty={removeQuantity}
+                          />
+                        ))}
                     </div>
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        disabled={
-                          !orderItems.some(
-                            (item) => item.productId === product.id
-                          )
-                        }
-                        variant="ghost"
-                        onClick={() => removeQuantity(product)}
-                      >
-                        <MinusCircle size={30} />
-                      </Button>
-                      <p className="text-lg font-medium">
-                        {orderItems.find(
-                          (item) => item.productId === product.id
-                        )?.quantity ?? 0}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        onClick={() => addQuantity(product)}
-                      >
-                        <PlusCircle size={30} />
-                      </Button>
-                    </div>
-                  </div>
-                  {index !== filteredProducts.length - 1 && (
-                    <Separator className="mt-4" />
-                  )}
-                </div>
-              ))}
+                  )
+              )}
             </div>
           </>
         ) : (

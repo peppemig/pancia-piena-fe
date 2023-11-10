@@ -50,13 +50,23 @@ const Register = () => {
           title: "Registrazione effettuata",
         });
       })
-      .catch(() =>
-        toast({
-          variant: "destructive",
-          title: "Ooops! Qualcosa è andato storto",
-          description: "Prova ad effettuare nuovamente la registrazione",
-        })
-      );
+      .catch((error) => {
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            toast({
+              variant: "destructive",
+              title: "Attenzione",
+              description: "Questa email è già stata utilizzata",
+            });
+            break;
+          default:
+            toast({
+              variant: "destructive",
+              title: "Ooops! Qualcosa è andato storto",
+              description: "Prova ad effettuare nuovamente la registrazione",
+            });
+        }
+      });
   };
 
   const onGoogleSignIn = () => {
