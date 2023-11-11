@@ -9,6 +9,7 @@ import Orders from "./pages/Orders";
 import Dashboard from "./pages/Dashboard";
 import CreateOrder from "./pages/CreateOrder";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -16,10 +17,19 @@ function App() {
       <Toaster />
       <Navbar />
       <Routes>
+        <Route index element={<Home />} />
         <Route path="/" element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="products">
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="list"
             element={
@@ -28,8 +38,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="orders">
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="list"
             element={
@@ -46,6 +65,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route
           path="dashboard"
@@ -55,6 +75,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

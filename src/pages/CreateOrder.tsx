@@ -4,39 +4,26 @@ import { useToast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Product, OrderItem } from "../types/types";
 import ordersService from "@/api/ordersService";
 import { io, Socket } from "socket.io-client";
-import { ORIGIN_URL } from "@/constants/constants";
+import { ORIGIN_URL, categories } from "@/constants/constants";
 import { useAuthState } from "@/providers/AuthProvider";
 import OrderItemRow from "@/components/create-order/OrderItemRow";
+import FilterButton from "@/components/create-order/FilterButton";
 
 const CreateOrder = () => {
   const { user } = useAuthState();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [currentFilter, setCurrentFilter] = useState<string>("TUTTI");
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
-
-  const categories: Record<string, string> = {
-    ANTIPASTO: "Antipasti",
-    PRIMO: "Primi",
-    SECONDO: "Secondi",
-    DOLCE: "Dolci",
-    BEVANDA: "Bevande",
-  };
 
   useEffect(() => {
     getProducts();
@@ -174,6 +161,17 @@ const CreateOrder = () => {
     }
   };
 
+  const filterProducts = (value: string) => {
+    if (value === "TUTTI") {
+      setFilteredProducts(products);
+      setCurrentFilter(value);
+      return;
+    }
+    const filter = products.filter((product) => product.category === value);
+    setFilteredProducts(filter);
+    setCurrentFilter(value);
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -181,32 +179,16 @@ const CreateOrder = () => {
   return (
     <div className="container-custom py-6 space-y-4">
       <h2 className="text-3xl font-bold tracking-tight">Crea un ordine</h2>
-      <div className="flex items-center gap-4">
-        <p className="text-lg font-semibold">Filtra prodotti per categoria:</p>
-        <Select
-          onValueChange={(value) => {
-            if (value === "TUTTI") {
-              setFilteredProducts(products);
-              return;
-            }
-            const filter = products.filter(
-              (product) => product.category === value
-            );
-            setFilteredProducts(filter);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Seleziona" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="TUTTI">Tutti</SelectItem>
-            <SelectItem value="ANTIPASTO">Antipasti</SelectItem>
-            <SelectItem value="PRIMO">Primi</SelectItem>
-            <SelectItem value="SECONDO">Secondi</SelectItem>
-            <SelectItem value="DOLCE">Dolci</SelectItem>
-            <SelectItem value="BEVANDA">Bevande</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex flex-wrap gap-2">
+        {Object.keys(categories).map((cat) => (
+          <FilterButton
+            key={cat}
+            label={categories[cat]}
+            value={cat}
+            currentFilter={currentFilter}
+            onClick={filterProducts}
+          />
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-4">
         {filteredProducts.length > 0 ? (
