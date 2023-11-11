@@ -30,7 +30,13 @@ const CreateOrder = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const { toast } = useToast();
 
-  const categories = ["ANTIPASTO", "PRIMO", "SECONDO", "DOLCE", "BEVANDA"];
+  const categories: Record<string, string> = {
+    ANTIPASTO: "Antipasti",
+    PRIMO: "Primi",
+    SECONDO: "Secondi",
+    DOLCE: "Dolci",
+    BEVANDA: "Bevande",
+  };
 
   useEffect(() => {
     getProducts();
@@ -202,25 +208,37 @@ const CreateOrder = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-4">
         {filteredProducts.length > 0 ? (
           <>
-            <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
-              {categories.map(
+            <div className="col-span-2 space-y-2">
+              {Object.keys(categories).map(
                 (cat) =>
                   filteredProducts.some((prod) => prod.category === cat) && (
-                    <div key={cat}>
-                      <h2>{cat}</h2>
+                    <div
+                      key={cat}
+                      className="p-6 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit"
+                    >
+                      <h2 className="text-2xl font-bold pb-2">
+                        {categories[cat].toUpperCase()}
+                      </h2>
                       {filteredProducts
                         .filter((prod) => prod.category === cat)
-                        .map((fprod) => (
-                          <OrderItemRow
-                            key={fprod.id}
-                            product={fprod}
-                            orderItems={orderItems}
-                            addQty={addQuantity}
-                            removeQty={removeQuantity}
-                          />
+                        .map((fprod, index, arr) => (
+                          <div key={fprod.id}>
+                            <OrderItemRow
+                              product={fprod}
+                              orderItems={orderItems}
+                              addQty={addQuantity}
+                              removeQty={removeQuantity}
+                            />
+                            {index !== arr.length - 1 && (
+                              <Separator
+                                key={`sep-${fprod.id}`}
+                                className="my-2"
+                              />
+                            )}
+                          </div>
                         ))}
                     </div>
                   )
@@ -232,7 +250,7 @@ const CreateOrder = () => {
             Nessun prodotto trovato
           </div>
         )}
-        <div className="sticky mt-2 lg:mt-0 top-6 h-fit col-span-1 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
+        <div className="sticky mt-2 md:mt-0 top-20 h-fit col-span-1 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
           <p className="text-xl font-bold">Riepilogo ordine</p>
           {orderItems.map((item) => (
             <div

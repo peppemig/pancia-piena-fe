@@ -19,7 +19,7 @@ const OrderItemRow = ({
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xl font-bold">{product.name}</p>
+          <p className="text-xl font-medium">{product.name}</p>
           <p className="text-lg font-medium">€{product.price}</p>
         </div>
         <div className="flex items-center justify-center gap-4">
