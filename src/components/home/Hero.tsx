@@ -24,7 +24,7 @@ const Hero = () => {
         </div>
         {auth.state === "loaded" && auth.isAuthentication ? (
           <Link
-            to="/orders/list"
+            to="/orders"
             className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}
           >
             Controlla i tuoi ordini!

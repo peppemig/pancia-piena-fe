@@ -65,9 +65,7 @@ const Navbar = () => {
                     <DropdownMenuLabel>Il mio account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/orders/list")}
-                      >
+                      <DropdownMenuItem onClick={() => navigate("/orders")}>
                         <ChefHat className="mr-2 h-4 w-4" />
                         <span>Ordini</span>
                       </DropdownMenuItem>
@@ -77,9 +75,7 @@ const Navbar = () => {
                         <PlusCircleIcon className="mr-2 h-4 w-4" />
                         <span>Crea un ordine</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/products/list")}
-                      >
+                      <DropdownMenuItem onClick={() => navigate("/products")}>
                         <Package className="mr-2 h-4 w-4" />
                         <span>Prodotti</span>
                       </DropdownMenuItem>

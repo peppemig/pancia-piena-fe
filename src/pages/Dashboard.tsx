@@ -11,9 +11,8 @@ import RecentOrderRow from "@/components/dashboard/RecentOrderRow";
 import { Stats } from "@/types/types";
 import { useAuthState } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-
 import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { checkSameDay, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -22,22 +21,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const checkSameDay = (firstDate: Date, secondDate: Date) => {
-  return (
-    firstDate.getDate() === secondDate.getDate() &&
-    firstDate.getMonth() === secondDate.getMonth() &&
-    firstDate.getFullYear() === secondDate.getFullYear()
-  );
-};
-
 const Dashboard = () => {
   const { user } = useAuthState();
   const [calendarDate, setCalendarDate] = useState<Date | undefined>(
     new Date()
   );
-  //const [year, setYear] = useState(new Date().getUTCFullYear());
-  //const [month, setMonth] = useState(new Date().getUTCMonth() + 1);
-  //const [day, setDay] = useState(new Date().getUTCDate());
 
   const year = calendarDate!.getFullYear();
   const month = calendarDate!.getMonth() + 1;
@@ -46,6 +34,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState<Stats>();
   const [ordersForTheDay, setOrdersForTheDay] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const { theme } = useTheme();
 
@@ -104,7 +93,7 @@ const Dashboard = () => {
     <div className="container-custom py-6 space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
         <h2 className="text-3xl font-bold tracking-tight">La tua dashboard</h2>
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
@@ -126,7 +115,10 @@ const Dashboard = () => {
               locale={it}
               mode="single"
               selected={calendarDate}
-              onSelect={setCalendarDate}
+              onSelect={(day: Date | undefined, date: Date) => {
+                setCalendarDate(date);
+                setOpen(false);
+              }}
               initialFocus
             />
           </PopoverContent>
