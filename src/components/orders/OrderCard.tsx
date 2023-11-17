@@ -101,7 +101,7 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {order.orderItems.map((item) => (
+        {order.orderItems?.map((item) => (
           <p key={item.id} className="text-xl font-medium">
             {item.quantity} x {item.product.name}
           </p>
