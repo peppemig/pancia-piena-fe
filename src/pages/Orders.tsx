@@ -8,21 +8,26 @@ import { Button } from "@/components/ui/button";
 import { io, Socket } from "socket.io-client";
 import { ORIGIN_URL } from "@/constants/constants";
 import { useAuthState } from "@/providers/AuthProvider";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type OrderFilter = "in-corso" | "completati";
 
 const Orders = () => {
   const { user } = useAuthState();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersData, setOrdersData] = useState<{
+    orders: Order[];
+    totalPages?: number;
+  }>();
   const [isLoading, setIsLoading] = useState(false);
   const [ordersFilter, setOrdersFilter] = useState<OrderFilter>("in-corso");
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [page, setPage] = useState(1);
 
   const { toast } = useToast();
 
   useEffect(() => {
     getOrders();
-  }, [user, ordersFilter]);
+  }, [user, ordersFilter, page]);
 
   useEffect(() => {
     socket?.on("order-received", () => {
@@ -63,11 +68,11 @@ const Orders = () => {
         const fetchOrders =
           ordersFilter === "in-corso"
             ? ordersService.getOrders(token)
-            : ordersService.getCompletedOrders(token);
+            : ordersService.getCompletedOrdersPaginated(token, page);
 
         fetchOrders
           .then((res) => {
-            setOrders(res.data.orders);
+            setOrdersData(res.data.ordersData);
           })
           .catch(() => {
             toast({
@@ -110,6 +115,7 @@ const Orders = () => {
         <Button
           onClick={() => {
             if (ordersFilter === "completati") return;
+            setPage(1);
             setOrdersFilter("completati");
           }}
           variant={ordersFilter === "completati" ? "default" : "secondary"}
@@ -117,23 +123,51 @@ const Orders = () => {
           Completati
         </Button>
       </div>
-      {orders.length === 0 && (
+      {ordersData && ordersData.orders.length > 0 ? (
+        <>
+          {ordersFilter === "completati" && (
+            <div className="flex items-center justify-center">
+              <Button
+                variant="ghost"
+                disabled={page === 1}
+                onClick={() => {
+                  if (page === 1) return;
+                  setPage((prev) => prev - 1);
+                }}
+              >
+                <ChevronLeft size={30} />
+              </Button>
+              <p className="text-lg font-medium tracking-tight">
+                Pagina {page} di {ordersData.totalPages}
+              </p>
+              <Button
+                variant="ghost"
+                disabled={page === ordersData.totalPages}
+                onClick={() => {
+                  if (page === ordersData.totalPages) return;
+                  setPage((prev) => prev + 1);
+                }}
+              >
+                <ChevronRight size={30} />
+              </Button>
+            </div>
+          )}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {ordersData.orders.map((order) => (
+              <OrderCard
+                filter={ordersFilter}
+                key={order.id}
+                order={order}
+                refreshOrders={getOrders}
+                user={user!}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
         <h2 className="text-xl font-medium tracking-tight">
           Non hai ancora nessun ordine 😐
         </h2>
-      )}
-      {orders.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {orders.map((order) => (
-            <OrderCard
-              filter={ordersFilter}
-              key={order.id}
-              order={order}
-              refreshOrders={getOrders}
-              user={user!}
-            />
-          ))}
-        </div>
       )}
     </div>
   );

@@ -9,10 +9,13 @@ const getOrders = async (token: string) => {
   return response;
 };
 
-const getCompletedOrders = async (token: string) => {
-  const response = await axios.get(`${API_BASE_URL}/orders/completed`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+const getCompletedOrdersPaginated = async (token: string, page: number) => {
+  const response = await axios.get(
+    `${API_BASE_URL}/orders/completed?page=${page.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response;
 };
 
@@ -44,5 +47,5 @@ export default {
   getOrders,
   deleteOrder,
   setOrderToCompleted,
-  getCompletedOrders,
+  getCompletedOrdersPaginated,
 };
