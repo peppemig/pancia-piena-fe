@@ -18,33 +18,56 @@ import {
 import { Order } from "@/types/types";
 import { Button } from "../ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useState } from "react";
 import { User } from "firebase/auth";
 import { useToast } from "@/components/ui/use-toast";
 import ordersService from "@/api/ordersService";
-import LoadingState from "../LoadingState";
 
 type OrderCardProps = {
   order: Order;
   user: User;
   filter: "in-corso" | "completati";
-  refreshOrders: () => void;
+  refreshOrders: (isInitial: boolean) => void;
+  setIsLoadingNewOrder: React.Dispatch<React.SetStateAction<boolean>>;
+  ordersData: {
+    orders: Order[];
+    totalPages?: number;
+  };
+  setOrdersData: React.Dispatch<
+    React.SetStateAction<
+      | {
+          orders: Order[];
+          totalPages?: number | undefined;
+        }
+      | undefined
+    >
+  >;
 };
 
-const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+const OrderCard = ({
+  order,
+  refreshOrders,
+  user,
+  filter,
+  setIsLoadingNewOrder,
+  ordersData,
+  setOrdersData,
+}: OrderCardProps) => {
   const { toast } = useToast();
 
   const onDeleteOrder = () => {
-    setIsLoading(true);
+    setOrdersData({
+      orders: ordersData.orders.filter((item) => item !== order),
+      totalPages: ordersData.totalPages,
+    });
+    setIsLoadingNewOrder(true);
     user
       .getIdToken()
       .then((token) => {
         ordersService
           .deleteOrder(token, order.id)
-          .then(() => refreshOrders())
+          .then(() => refreshOrders(false))
           .catch(() => {
-            setIsLoading(false);
+            setIsLoadingNewOrder(false);
             toast({
               variant: "destructive",
               title: "Ooops! Qualcosa è andato storto",
@@ -53,7 +76,7 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
           });
       })
       .catch(() => {
-        setIsLoading(false);
+        setIsLoadingNewOrder(false);
         toast({
           variant: "destructive",
           title: "Ooops! Qualcosa è andato storto",
@@ -63,15 +86,19 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
   };
 
   const onCompleteOrder = () => {
-    setIsLoading(true);
+    setOrdersData({
+      orders: ordersData.orders.filter((item) => item !== order),
+      totalPages: ordersData.totalPages,
+    });
+    setIsLoadingNewOrder(true);
     user
       .getIdToken()
       .then((token) => {
         ordersService
           .setOrderToCompleted(token, order.id)
-          .then(() => refreshOrders())
+          .then(() => refreshOrders(false))
           .catch(() => {
-            setIsLoading(false);
+            setIsLoadingNewOrder(false);
             toast({
               variant: "destructive",
               title: "Ooops! Qualcosa è andato storto",
@@ -80,7 +107,7 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
           });
       })
       .catch(() => {
-        setIsLoading(false);
+        setIsLoadingNewOrder(false);
         toast({
           variant: "destructive",
           title: "Ooops! Qualcosa è andato storto",
@@ -88,10 +115,6 @@ const OrderCard = ({ order, refreshOrders, user, filter }: OrderCardProps) => {
         });
       });
   };
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
 
   return (
     <Card className="flex flex-col justify-between">

@@ -4,7 +4,6 @@ import { ResponsiveContainer, Bar, BarChart, XAxis, YAxis } from "recharts";
 import { useEffect, useState } from "react";
 import statsService from "@/api/statsService";
 import { useToast } from "@/components/ui/use-toast";
-import LoadingState from "@/components/LoadingState";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import RecentOrderRow from "@/components/dashboard/RecentOrderRow";
@@ -20,6 +19,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
+import RecentOrdersSkeleton from "@/components/dashboard/RecentOrdersSkeleton";
 
 const Dashboard = () => {
   const { user } = useAuthState();
@@ -85,10 +86,6 @@ const Dashboard = () => {
       });
   };
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
   return (
     <div className="container-custom py-6 space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
@@ -124,102 +121,122 @@ const Dashboard = () => {
           </PopoverContent>
         </Popover>
       </div>
-      {stats && Object.keys(stats).length > 0 && (
-        <>
-          <div className="grid gap-4 md:grid-cols-3">
-            <DashboardCard
-              type="currency"
-              label="Totale guadagni"
-              desc={formattedMonthYear}
-              value={stats.monthTotal._sum.totalPrice || 0}
-            />
-            <DashboardCard
-              type="stat"
-              label="Totale ordini"
-              desc={formattedMonthYear}
-              value={stats.graphStats.reduce(
-                (total, item) => total + item.ordersForTheDay,
-                0
+      <div className="grid gap-4 md:grid-cols-3">
+        <DashboardCard
+          isLoading={isLoading}
+          type="currency"
+          label="Totale guadagni"
+          desc={formattedMonthYear}
+          value={stats?.monthTotal._sum.totalPrice || 0}
+        />
+        <DashboardCard
+          isLoading={isLoading}
+          type="stat"
+          label="Totale ordini"
+          desc={formattedMonthYear}
+          value={
+            stats?.graphStats.reduce(
+              (total, item) => total + item.ordersForTheDay,
+              0
+            ) || 0
+          }
+        />
+        <DashboardCard
+          isLoading={isLoading}
+          type="stat"
+          label="Ordini oggi"
+          desc={formattedDayMonthYear}
+          value={ordersForTheDay || 0}
+        />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-2 lg:col-span-4">
+          <CardHeader>
+            <CardTitle>Panoramica mensile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading && <Skeleton className="h-96" />}
+            {!isLoading &&
+              stats &&
+              Object.keys(stats).length > 0 &&
+              stats.graphStats.length === 0 && (
+                <div>Nessun ordine questo mese</div>
               )}
-            />
-            <DashboardCard
-              type="stat"
-              label="Ordini oggi"
-              desc={formattedDayMonthYear}
-              value={ordersForTheDay || 0}
-            />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-2 lg:col-span-4">
-              <CardHeader>
-                <CardTitle>Panoramica mensile</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {stats.graphStats.length > 0 ? (
-                  <ResponsiveContainer width="95%" height={450}>
-                    <BarChart data={stats.graphStats}>
-                      <XAxis
-                        label={{
-                          value: "Giorno",
-                          position: "insideBottomRight",
-                          dy: 10,
-                        }}
-                        dataKey="day"
-                        stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) =>
-                          `${
-                            new Date(value).getDate() +
-                            "-" +
-                            (new Date(value).getMonth() + 1)
-                          }`
-                        }
-                      />
-                      <YAxis
-                        label={{
-                          value: "N. ordini",
-                          position: "insideLeft",
-                          angle: -90,
-                        }}
-                        stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => `${value}`}
-                      />
-                      <Bar
-                        dataKey="ordersForTheDay"
-                        fill={theme === "dark" ? "#1E293B" : "#F1F5F9"}
-                        radius={[4, 4, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div>Nessun ordine questo mese</div>
-                )}
-              </CardContent>
-            </Card>
-            <Card className="col-span-2 lg:col-span-3 h-fit">
-              <CardHeader>
-                <CardTitle>Ordini recenti</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-8">
-                  {stats.last5Orders.map((order) => (
-                    <RecentOrderRow
-                      key={order.id}
-                      tableNumber={order.tableNumber}
-                      totalPrice={order.totalPrice}
+            {!isLoading &&
+              stats &&
+              Object.keys(stats).length > 0 &&
+              stats.graphStats.length > 0 && (
+                <ResponsiveContainer width="95%" height={450}>
+                  <BarChart data={stats.graphStats}>
+                    <XAxis
+                      label={{
+                        value: "Giorno",
+                        position: "insideBottomRight",
+                        dy: 10,
+                      }}
+                      dataKey="day"
+                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) =>
+                        `${
+                          new Date(value).getDate() +
+                          "-" +
+                          (new Date(value).getMonth() + 1)
+                        }`
+                      }
                     />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
+                    <YAxis
+                      label={{
+                        value: "N. ordini",
+                        position: "insideLeft",
+                        angle: -90,
+                      }}
+                      stroke={theme === "dark" ? "#F8FAFC" : "#020817"}
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `${value}`}
+                    />
+                    <Bar
+                      dataKey="ordersForTheDay"
+                      fill={theme === "dark" ? "#1E293B" : "#F1F5F9"}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+          </CardContent>
+        </Card>
+        <Card className="col-span-2 lg:col-span-3 h-fit">
+          <CardHeader>
+            <CardTitle>Ordini recenti</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {isLoading && <RecentOrdersSkeleton />}
+              {!isLoading &&
+                stats &&
+                Object.keys(stats).length > 0 &&
+                stats.last5Orders.length > 0 &&
+                stats.last5Orders.map((order) => (
+                  <RecentOrderRow
+                    key={order.id}
+                    tableNumber={order.tableNumber}
+                    totalPrice={order.totalPrice}
+                  />
+                ))}
+              {!isLoading &&
+                stats &&
+                Object.keys(stats).length > 0 &&
+                stats.last5Orders.length === 0 && (
+                  <div>Nessun ordine trovato</div>
+                )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

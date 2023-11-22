@@ -5,15 +5,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "../ui/skeleton";
 
 type DasboardCardProps = {
   label: string;
-  value: number;
+  value: number | undefined;
   desc: string;
   type: "currency" | "stat";
+  isLoading: boolean;
 };
 
-const DashboardCard = ({ label, value, type, desc }: DasboardCardProps) => {
+const DashboardCard = ({
+  label,
+  value,
+  type,
+  desc,
+  isLoading,
+}: DasboardCardProps) => {
   return (
     <Card>
       <CardHeader className="space-y-0 pb-2">
@@ -22,8 +30,14 @@ const DashboardCard = ({ label, value, type, desc }: DasboardCardProps) => {
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-bold">
-          {type === "currency" ? "€" : ""}
-          {value}
+          {isLoading ? (
+            <Skeleton className="h-10" />
+          ) : (
+            <p>
+              {type === "currency" ? "€" : ""}
+              {value}
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

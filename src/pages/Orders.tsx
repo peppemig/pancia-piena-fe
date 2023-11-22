@@ -1,7 +1,6 @@
 import { Order } from "@/types/types";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import LoadingState from "@/components/LoadingState";
 import ordersService from "@/api/ordersService";
 import OrderCard from "@/components/orders/OrderCard";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { io, Socket } from "socket.io-client";
 import { ORIGIN_URL } from "@/constants/constants";
 import { useAuthState } from "@/providers/AuthProvider";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import OrderCardSkeleton from "@/components/orders/OrderCardSkeleton";
 
 type OrderFilter = "in-corso" | "completati";
 
@@ -19,6 +19,7 @@ const Orders = () => {
     totalPages?: number;
   }>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingNewOrder, setIsLoadingNewOrder] = useState(false);
   const [ordersFilter, setOrdersFilter] = useState<OrderFilter>("in-corso");
   const [socket, setSocket] = useState<Socket | null>(null);
   const [page, setPage] = useState(1);
@@ -26,12 +27,12 @@ const Orders = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    getOrders();
+    getOrders(true);
   }, [user, ordersFilter, page]);
 
   useEffect(() => {
     socket?.on("order-received", () => {
-      getOrders();
+      getOrders(false);
     });
   }, [socket]);
 
@@ -60,8 +61,8 @@ const Orders = () => {
     };
   }, [user]);
 
-  const getOrders = () => {
-    setIsLoading(true);
+  const getOrders = (isInitial: boolean) => {
+    isInitial ? setIsLoading(true) : setIsLoadingNewOrder(true);
     user!
       .getIdToken()
       .then((token) => {
@@ -82,11 +83,11 @@ const Orders = () => {
             });
           })
           .finally(() => {
-            setIsLoading(false);
+            isInitial ? setIsLoading(false) : setIsLoadingNewOrder(false);
           });
       })
       .catch(() => {
-        setIsLoading(false);
+        isInitial ? setIsLoading(false) : setIsLoadingNewOrder(false);
         toast({
           variant: "destructive",
           title: "Ooops! Qualcosa è andato storto",
@@ -94,10 +95,6 @@ const Orders = () => {
         });
       });
   };
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
 
   return (
     <div className="container-custom py-6 space-y-4">
@@ -123,7 +120,12 @@ const Orders = () => {
           Completati
         </Button>
       </div>
-      {ordersData && ordersData.orders.length > 0 ? (
+      {isLoading && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <OrderCardSkeleton qty={4} />
+        </div>
+      )}
+      {!isLoading && ordersData && ordersData.orders.length > 0 && (
         <>
           {ordersFilter === "completati" && (
             <div className="flex items-center justify-center">
@@ -160,11 +162,16 @@ const Orders = () => {
                 order={order}
                 refreshOrders={getOrders}
                 user={user!}
+                setIsLoadingNewOrder={setIsLoadingNewOrder}
+                ordersData={ordersData}
+                setOrdersData={setOrdersData}
               />
             ))}
+            {isLoadingNewOrder && <OrderCardSkeleton />}
           </div>
         </>
-      ) : (
+      )}
+      {!isLoading && ordersData && ordersData.orders.length === 0 && (
         <h2 className="text-xl font-medium tracking-tight">
           Non hai ancora nessun ordine 😐
         </h2>
