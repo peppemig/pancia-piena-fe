@@ -1,7 +1,6 @@
 import ProductCard from "@/components/products/ProductCard";
 import { useEffect, useState } from "react";
 import productsService from "@/api/productsService";
-import LoadingState from "@/components/LoadingState";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Product, Category } from "../types/types";
@@ -9,6 +8,7 @@ import { useAuthState } from "@/providers/AuthProvider";
 import { categories } from "@/constants/constants";
 import FilterButton from "../components/create-order/FilterButton";
 import AddProductModal from "@/components/products/AddProductModal";
+import ProductsSkeletonLoader from "@/components/products/ProductsSkeletonLoader";
 
 const formSchema = z.object({
   name: z.string().min(1).max(50),
@@ -101,10 +101,6 @@ const Products = () => {
     setCurrentFilter(value);
   };
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
   return (
     <div className="container-custom py-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -126,7 +122,13 @@ const Products = () => {
           />
         ))}
       </div>
-      {filteredProducts.length > 0 ? (
+      {isLoading && <ProductsSkeletonLoader />}
+      {!isLoading && filteredProducts.length === 0 && (
+        <h2 className="text-xl font-medium tracking-tight">
+          Non hai ancora aggiunto nessun prodotto 😐
+        </h2>
+      )}
+      {!isLoading && filteredProducts.length > 0 && (
         <div className="flex flex-col space-y-8">
           {Object.keys(categories).map(
             (cat) =>
@@ -154,10 +156,6 @@ const Products = () => {
               )
           )}
         </div>
-      ) : (
-        <h2 className="text-xl font-medium tracking-tight">
-          Non hai ancora aggiunto nessun prodotto 😐
-        </h2>
       )}
     </div>
   );

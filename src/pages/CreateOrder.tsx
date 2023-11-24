@@ -1,7 +1,6 @@
 import productsService from "@/api/productsService";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import LoadingState from "@/components/LoadingState";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import { ORIGIN_URL, categories } from "@/constants/constants";
 import { useAuthState } from "@/providers/AuthProvider";
 import OrderItemRow from "@/components/create-order/OrderItemRow";
 import FilterButton from "@/components/create-order/FilterButton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CreateOrder = () => {
   const { user } = useAuthState();
@@ -172,9 +172,9 @@ const CreateOrder = () => {
     setCurrentFilter(value);
   };
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
+  //if (isLoading) {
+  //  return <LoadingState />;
+  //}
 
   return (
     <div className="container-custom py-6 space-y-4">
@@ -191,7 +191,19 @@ const CreateOrder = () => {
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-4">
-        {filteredProducts.length > 0 ? (
+        {isLoading && (
+          <div className="col-span-2 space-y-2">
+            <Skeleton className="p-6 rounded-lg h-60" />
+            <Skeleton className="p-6 rounded-lg h-60" />
+            <Skeleton className="p-6 rounded-lg h-60" />
+          </div>
+        )}
+        {!isLoading && filteredProducts.length === 0 && (
+          <div className="col-span-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
+            <p className="text-xl font-bold">Nessun prodotto trovato</p>
+          </div>
+        )}
+        {!isLoading && filteredProducts.length > 0 && (
           <>
             <div className="col-span-2 space-y-2">
               {Object.keys(categories).map(
@@ -227,62 +239,68 @@ const CreateOrder = () => {
               )}
             </div>
           </>
-        ) : (
-          <div className="col-span-2 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full h-fit">
-            Nessun prodotto trovato
-          </div>
         )}
         <div className="sticky mt-2 md:mt-0 top-20 h-fit col-span-1 p-6 space-y-4 rounded-lg border bg-card text-card-foreground shadow-sm w-full">
-          <p className="text-xl font-bold">Riepilogo ordine</p>
-          {orderItems.map((item) => (
-            <div
-              key={item.productId}
-              className="flex items-center justify-between"
-            >
-              <div className="flex flex-col">
-                <p className="text-lg font-medium">{item.productName}</p>
-                <p className="text-md">Quantità: {item.quantity}</p>
-              </div>
-              <p className="text-lg font-bold">
-                €{item.quantity * item.productPrice}
-              </p>
-            </div>
-          ))}
-          <Separator />
-          <div className="flex flex-col gap-2">
-            <Label className="text-lg font-medium" htmlFor="numberoTavolo">
-              Numero tavolo
-            </Label>
-            <Input
-              value={tableNumber || ""}
-              onChange={(e) => setTableNumber(parseInt(e.target.value))}
-              min="1"
-              type="number"
-              id="numeroTavolo"
-              placeholder="Inserisci il numero del tavolo"
-            />
-          </div>
-          <div className="flex items-center justify-between text-xl font-bold">
-            <p>Totale:</p>
-            <p>
-              €
-              {orderItems.reduce(
-                (total, item) => total + item.quantity * item.productPrice,
-                0
-              )}
+          {isLoading && <Skeleton className="h-40" />}
+          {!isLoading && filteredProducts.length === 0 && (
+            <p className="font-semibold">
+              Aggiungi dei prodotti per poter effettuare un ordine
             </p>
-          </div>
-          <Button
-            onClick={createOrder}
-            disabled={
-              orderItems.length === 0 ||
-              tableNumber === null ||
-              isNaN(tableNumber)
-            }
-            className="w-full"
-          >
-            Effettua ordine
-          </Button>
+          )}
+          {!isLoading && filteredProducts.length > 0 && (
+            <>
+              <p className="text-xl font-bold">Riepilogo ordine</p>
+              {orderItems.map((item) => (
+                <div
+                  key={item.productId}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex flex-col">
+                    <p className="text-lg font-medium">{item.productName}</p>
+                    <p className="text-md">Quantità: {item.quantity}</p>
+                  </div>
+                  <p className="text-lg font-bold">
+                    €{item.quantity * item.productPrice}
+                  </p>
+                </div>
+              ))}
+              <Separator />
+              <div className="flex flex-col gap-2">
+                <Label className="text-lg font-medium" htmlFor="numberoTavolo">
+                  Numero tavolo
+                </Label>
+                <Input
+                  value={tableNumber || ""}
+                  onChange={(e) => setTableNumber(parseInt(e.target.value))}
+                  min="1"
+                  type="number"
+                  id="numeroTavolo"
+                  placeholder="Inserisci il numero del tavolo"
+                />
+              </div>
+              <div className="flex items-center justify-between text-xl font-bold">
+                <p>Totale:</p>
+                <p>
+                  €
+                  {orderItems.reduce(
+                    (total, item) => total + item.quantity * item.productPrice,
+                    0
+                  )}
+                </p>
+              </div>
+              <Button
+                onClick={createOrder}
+                disabled={
+                  orderItems.length === 0 ||
+                  tableNumber === null ||
+                  isNaN(tableNumber)
+                }
+                className="w-full"
+              >
+                Effettua ordine
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
