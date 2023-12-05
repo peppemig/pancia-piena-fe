@@ -123,7 +123,12 @@ const Login = () => {
                 <FormItem>
                   <FormLabel className="text-lg">Password</FormLabel>
                   <FormControl>
-                    <Input className="text-md" placeholder="" {...field} />
+                    <Input
+                      type="password"
+                      className="text-md"
+                      placeholder=""
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
