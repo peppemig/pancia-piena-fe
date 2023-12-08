@@ -8,23 +8,23 @@
 
 Il frontend di Pancia Piena è sviluppato utilizzando tecnologie moderne che offrono una user experience ricca e reattiva.
 
-- **React**: Libreria JavaScript per la creazione di interfacce utente, offre un approccio dichiarativo alla programmazione per la costruzione di componenti riutilizzabili.
+- **React**
   
-- **Vite**: Framework veloce per lo sviluppo di applicazioni web moderne. Vite si integra bene con React, fornendo un'esperienza di sviluppo rapida e efficiente.
+- **Vite**
 
-- **Shadcn**: Libreria per gli effetti visivi in React, permette di integrare facilmente shader nell'applicazione per creare esperienze visive accattivanti.
+- **Shadcn**
 
 ### Backend
 
 Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile, utilizzando diverse tecnologie per garantire prestazioni e sicurezza.
 
-- **Express.js**: Framework web per Node.js che semplifica la creazione di API e l'handling delle richieste HTTP, fornendo un'infrastruttura solida per il backend.
+- **Express.js**
 
-- **PostgreSQL**: Database relazionale open-source, scelto per la sua affidabilità e capacità di gestire grandi volumi di dati.
+- **PostgreSQL**
 
-- **Redis**: Sistema di memorizzazione chiave-valore in memoria, utilizzato per la gestione della cache e l'ottimizzazione delle prestazioni.
+- **Redis**
 
-- **Firebase Auth**: Servizio di autenticazione di Firebase per la gestione sicura e semplificata dell'identità degli utenti.
+- **Firebase Auth**
 
-Queste tecnologie sono state selezionate per offrire un'applicazione completa, performante e scalabile, garantendo al contempo una user experience fluida e coinvolgente.
+- **Socket.io**
 
