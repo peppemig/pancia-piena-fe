@@ -14,7 +14,7 @@ Il frontend di Pancia Piena è sviluppato utilizzando tecnologie moderne che off
 
 - **Shadcn**
 
-### Backend ([Clicca qui per andare al repository del backend]([https://www.tuosito.com](https://github.com/peppemig/pancia-piena-be)))
+### Backend ([Clicca qui per andare al repository del backend](https://www.tuosito.com](https://github.com/peppemig/pancia-piena-be)))
 
 Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile, utilizzando diverse tecnologie per garantire prestazioni e sicurezza.
 
