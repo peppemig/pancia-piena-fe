@@ -6,7 +6,7 @@
 
 ### Frontend
 
-Il frontend di Pancia Piena è sviluppato utilizzando tecnologie moderne che offrono una user experience ricca e reattiva.
+Il frontend di Pancia Piena è sviluppato utilizzando React e la libreria grafica Shadcn.
 
 - **React**
   
@@ -16,7 +16,7 @@ Il frontend di Pancia Piena è sviluppato utilizzando tecnologie moderne che off
 
 ### Backend - [Clicca qui per andare al repository del backend](https://github.com/peppemig/pancia-piena-be)
 
-Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile, utilizzando diverse tecnologie per garantire prestazioni e sicurezza.
+Il backend di Pancia Piena è sviluppato utilizzando Express.js, PostreSQL, Redis (per il caching dei dati), Firebase Auth (per l'autenticazione) e Socket.io (per gestire i websockets).
 
 - **Express.js**
 
@@ -28,7 +28,11 @@ Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile,
 
 - **Socket.io**
 
-## Interfaccia
+### Mobile - 
+
+## Interfaccia - [Clicca qui per andare al repository del'app mobile](https://github.com/peppemig/pancia-piena-mobile)
+
+L'app mobile di Pancia Piena è sviluppata utilizzando React Native (Expo).
 
 #### Homepage
 ![home](https://github.com/peppemig/pancia-piena-fe/assets/120139042/7be43a7f-dec0-45e3-b936-a52ef6549e97)
