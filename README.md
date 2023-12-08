@@ -30,7 +30,7 @@ Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile,
 
 ## Interfaccia
 
-# Homepage
+#### Homepage
 ![home](https://github.com/peppemig/pancia-piena-fe/assets/120139042/7be43a7f-dec0-45e3-b936-a52ef6549e97)
 
 # Pagina ordini (refresh in real-time grazie a websockets)
