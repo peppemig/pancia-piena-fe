@@ -28,11 +28,13 @@ Il backend di Pancia Piena è sviluppato utilizzando Express.js, PostreSQL, Redi
 
 - **Socket.io**
 
-### Mobile - 
-
-## Interfaccia - [Clicca qui per andare al repository del'app mobile](https://github.com/peppemig/pancia-piena-mobile)
+### Mobile - [Clicca qui per andare al repository del'app mobile](https://github.com/peppemig/pancia-piena-mobile)
 
 L'app mobile di Pancia Piena è sviluppata utilizzando React Native (Expo).
+
+- **React Native**
+
+## Interfaccia
 
 #### Homepage
 ![home](https://github.com/peppemig/pancia-piena-fe/assets/120139042/7be43a7f-dec0-45e3-b936-a52ef6549e97)
