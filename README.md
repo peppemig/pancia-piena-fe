@@ -24,7 +24,7 @@ Il backend di Pancia Piena è alimentato da un'architettura robusta e scalabile,
 
 - **Redis**
 
-- **Firebase Auth**
+- **Firebase Auth** (metodi di autenticazione supportati: Google - Email/password)
 
 - **Socket.io**
 
