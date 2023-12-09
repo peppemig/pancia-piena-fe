@@ -27,7 +27,7 @@ The frontend is developed using React and Shadcn UI library.
 ## Interface
 
 #### Homepage
-![home](https://github.com/peppemig/pancia-piena-fe/assets/120139042/7be43a7f-dec0-45e3-b936-a52ef6549e97)
+![home](https://github.com/peppemig/pancia-piena-fe/assets/120139042/89614401-76bb-46a5-865b-1986c6d38fa9)
 
 #### Orders page (real-time refresh with websockets)
 ![orders](https://github.com/peppemig/pancia-piena-fe/assets/120139042/f0dbc6ea-bd70-4f36-880e-63649a30f19d)
