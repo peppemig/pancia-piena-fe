@@ -12,7 +12,7 @@ The frontend is developed using React and Shadcn UI library.
   
 - **Vite**
 
-- - **TailwindCSS**
+- **TailwindCSS**
 
 - **Shadcn**
 
