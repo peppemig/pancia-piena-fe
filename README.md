@@ -16,6 +16,8 @@ The frontend is developed using React and Shadcn UI library.
 
 - **Shadcn**
 
+- **Socket.io**
+
 ### Backend - [Click here to go to the backend repository](https://github.com/peppemig/pancia-piena-be)
 
 ### Mobile - [Click here to go to the mobile app repository](https://github.com/peppemig/pancia-piena-mobile)
