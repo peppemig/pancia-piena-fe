@@ -34,7 +34,7 @@ const Hero = () => {
             to="/register"
             className={`w-[10rem] ${cn(buttonVariants({ size: "lg" }))}`}
           >
-            Inizia ora!
+            Registrati
           </Link>
         )}
         <Lottie

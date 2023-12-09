@@ -18,10 +18,11 @@ import {
   PlusCircleIcon,
   LogOut,
   AreaChart,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Moon, Sun } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "../../providers/ThemeProvider";
@@ -46,6 +47,14 @@ const Navbar = () => {
         </Link>
         <NavigationMenu>
           <NavigationMenuList className="flex gap-1">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                theme === "dark" ? setTheme("light") : setTheme("dark");
+              }}
+            >
+              {theme === "dark" ? <Sun /> : <Moon />}
+            </Button>
             {auth.state === "loaded" && auth.isAuthentication ? (
               <>
                 <DropdownMenu>
@@ -97,29 +106,13 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link
                     to="/login"
-                    className={buttonVariants({ variant: "outline" })}
+                    className={buttonVariants({ variant: "secondary" })}
                   >
                     Accedi
                   </Link>
                 </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link
-                    to="/register"
-                    className={buttonVariants({ variant: "default" })}
-                  >
-                    Registrati
-                  </Link>
-                </NavigationMenuItem>
               </>
             )}
-            <Button
-              variant="ghost"
-              onClick={() => {
-                theme === "dark" ? setTheme("light") : setTheme("dark");
-              }}
-            >
-              {theme === "dark" ? <Sun /> : <Moon />}
-            </Button>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
